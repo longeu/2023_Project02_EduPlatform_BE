@@ -25,14 +25,14 @@ public class ReviewEntity extends BaseEntity {
     @JoinColumn(name = "courseID")
     private CourseEntity course;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @Column(name = "modifiedDate")
+
     private Date modifiedDate;
 
 }

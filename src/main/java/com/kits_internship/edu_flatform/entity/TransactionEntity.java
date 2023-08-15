@@ -31,7 +31,7 @@ public class TransactionEntity extends BaseEntity {
 
     private BigDecimal total;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;

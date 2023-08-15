@@ -24,13 +24,13 @@ public class UserEntity extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private RoleName role;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @Column(name = "modifiedDate")
+
     private Date modifiedDate;
 }

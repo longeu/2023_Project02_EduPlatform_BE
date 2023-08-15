@@ -20,7 +20,7 @@ public class ResultEntity extends BaseEntity{
     @Column(name = "totalPoint")
     private double totalPoint;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;

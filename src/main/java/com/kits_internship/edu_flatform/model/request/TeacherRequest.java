@@ -18,7 +18,4 @@ public class TeacherRequest {
     private String link;
     private List<String> certificates;
     private String experience;
-    private Long userID;
-    private Date createdDate;
-    private Date modifiedDate;
 }

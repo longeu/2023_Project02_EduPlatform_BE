@@ -22,14 +22,14 @@ public class QuestionBankEntity extends BaseEntity {
     @Column(name = "correctOption")
     private String correctOption;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @Column(name = "modifiedDate")
+
     private Date modifiedDate;
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)

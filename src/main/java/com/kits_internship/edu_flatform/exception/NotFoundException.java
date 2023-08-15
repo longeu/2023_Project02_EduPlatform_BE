@@ -14,7 +14,6 @@ public class NotFoundException extends BaseException {
     private static final long serialVersionUID = 1L;
     private Map<String, Object> messageResult;
 
-
     public NotFoundException(String message) {
         super(message);
     }
@@ -22,6 +21,4 @@ public class NotFoundException extends BaseException {
     public NotFoundException(Map<String, Object> messageResult) {
         this.messageResult = messageResult;
     }
-
-
 }

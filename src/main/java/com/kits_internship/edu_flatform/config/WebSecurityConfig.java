@@ -28,6 +28,9 @@ public class WebSecurityConfig {
     @Autowired
     private JwtAuthFilter authFilter;
 
+    @Autowired
+    AuthWhitelistFilter authWhitelistFilter;
+
     @Bean
     //authentication
     public UserDetailsService userDetailsService() {
@@ -49,13 +52,16 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.authorizeHttpRequests().requestMatchers("/api/user/register", "/api/user/login","/api/user/activeAccount").permitAll();
-        http.authorizeHttpRequests().requestMatchers("/api/teacher/**").hasAuthority(String.valueOf(RoleName.ROLE_TEACHER));
-        http.authorizeHttpRequests().requestMatchers("/api/student/**").hasAuthority(String.valueOf(RoleName.ROLE_STUDENT));
-        http.authorizeHttpRequests().anyRequest().authenticated();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authenticationProvider(authenticationProvider());
+        http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests((authorize) -> authorize
+                .requestMatchers(AuthWhitelistFilter.AUTH_WHITE_LIST).permitAll());
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/teacher/**")
+                .hasAuthority(String.valueOf(RoleName.ROLE_TEACHER)));
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/student/**")
+                .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
+        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

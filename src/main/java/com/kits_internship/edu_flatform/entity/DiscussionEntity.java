@@ -20,12 +20,12 @@ public class DiscussionEntity extends BaseEntity {
     private String question;
     private String answer;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
-    @Column(name = "modifiedDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date modifiedDate;

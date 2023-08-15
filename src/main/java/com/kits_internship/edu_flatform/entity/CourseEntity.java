@@ -25,14 +25,14 @@ public class CourseEntity extends BaseEntity{
     private StatusName status;
     private BigDecimal price;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @Column(name = "modifiedDate")
+
     private Date modifiedDate;
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)

@@ -34,12 +34,12 @@ public class DiscussionDetailEntity extends BaseEntity {
     @JoinColumn(name = "discussionID")
     private DiscussionEntity discussion;
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
-    @Column(name = "modifiedDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date modifiedDate;

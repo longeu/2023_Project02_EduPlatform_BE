@@ -23,13 +23,13 @@ public class PaymentEntity extends BaseEntity {
     @OneToMany(mappedBy = "payment")
     private List<TransactionEntity> transactions = new ArrayList<>();
 
-    @Column(name = "createdDate")
+
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    @Column(name = "modifiedDate")
+
     private Date modifiedDate;
 }

@@ -1,5 +1,6 @@
 package com.kits_internship.edu_flatform.model.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +20,9 @@ public class TeacherResponse {
     private List<String> certificates;
     private String experience;
     private Long userID;
+    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
+    @JsonFormat(pattern="dd-MM-yyyy HH:mm:ss")
     private Date modifiedDate;
 
 }

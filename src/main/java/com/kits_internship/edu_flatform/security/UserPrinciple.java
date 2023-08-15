@@ -26,15 +26,13 @@ public class UserPrinciple implements UserDetails {
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
-    private Set<String> roles;
 
     public UserPrinciple(Long id, String username, String password,
-                         Collection<? extends GrantedAuthority> authorities, Set<String> roles) {
+                         Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.authorities = authorities;
-        this.roles = roles;
     }
 
     public static UserPrinciple build(UserEntity entity, Set<String> roles) {
@@ -43,8 +41,7 @@ public class UserPrinciple implements UserDetails {
                 entity.getId(),
                 entity.getUsername(),
                 entity.getPassword(),
-                authorities,
-                roles
+                authorities
         );
     }
 

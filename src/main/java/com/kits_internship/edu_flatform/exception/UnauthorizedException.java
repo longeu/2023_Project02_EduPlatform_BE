@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
         reason = "UNAUTHORIZED"
 )
 public class UnauthorizedException extends BaseException {
+    private static final long serialVersionUID = 1L;
     public UnauthorizedException() {
     }
 }

@@ -1,6 +1,7 @@
 package com.kits_internship.edu_flatform.service.impl;
 
 import com.kits_internship.edu_flatform.config.DateConfig;
+import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.repository.BaseRepository;
 import com.kits_internship.edu_flatform.service.BaseService;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -65,14 +68,13 @@ public abstract class BaseServiceImpl<T, R extends BaseRepository<T, Long>> impl
 
     @Override
     public T findById(Long id) {
+        Map<String, Object> errors = new HashMap<>();
         try {
             Optional<T> result = jpaRepository.findById(id);
-            if (result.isPresent()) {
-                return result.get();
-            }
-            return null;
+            return result.orElse(null);
         } catch (Exception e) {
-            throw new EntityNotFoundException(e.getMessage());
+            errors.put("errors", e.getMessage());
+            throw new NotFoundException(errors);
         }
     }
 

@@ -30,7 +30,7 @@ public class ApiExceptionController {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ResponseEntity<Object> notFoundEntityExceptionException(Exception ex, WebRequest request) {
-        return ResponseEntity.badRequest().body(buildSuccessFailed(404, ((UnprocessableEntityException) ex).getMessageResult()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(buildSuccessFailed(404, ((UnprocessableEntityException) ex).getMessageResult()));
     }
 
     private static JSONObject buildSuccessFailed(int status, Object result) {

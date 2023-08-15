@@ -12,9 +12,11 @@ import com.kits_internship.edu_flatform.model.response.ActiveAccountResponse;
 import com.kits_internship.edu_flatform.model.response.LoginResponse;
 import com.kits_internship.edu_flatform.repository.UserRepository;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
-import com.kits_internship.edu_flatform.security.jwt.JwtProvider;
+import com.kits_internship.edu_flatform.security.jwt.JwtService;
 import com.kits_internship.edu_flatform.service.TeacherService;
 import com.kits_internship.edu_flatform.service.UserService;
+import io.jsonwebtoken.Claims;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +25,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +50,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private JwtProvider jwtProvider;
+    private JwtService jwtService;
 
     private static final int OTP = 123456;
     @Override
@@ -127,8 +128,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
             Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserPrinciple user = (UserPrinciple) authentication.getPrincipal();
-            String jwt = jwtProvider.generateToken(user);
-            loginResponse.setEmail(userEntity.get().getEmail());
+            String jwt = jwtService.generateToken(user);
+            loginResponse.setUsername(user.getUsername());
             loginResponse.setToken(jwt);
         } catch (Exception e) {
             errors.put("user", "Username or Password invalid!");
@@ -136,4 +137,15 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
         }
         return loginResponse;
     }
+
+    @Override
+    public UserEntity findByUsername(String username) {
+
+        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
+        if (userEntity.isEmpty()) {
+            return null;
+        }
+        return userEntity.get();
+    }
+
 }
