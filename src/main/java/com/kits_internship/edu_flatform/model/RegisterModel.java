@@ -18,6 +18,8 @@ public class RegisterModel {
     @NotBlank
     private String email;
     @NotBlank
+    private String username;
+    @NotBlank
     @Size(max = 100)
     private String firstName;
     @NotBlank

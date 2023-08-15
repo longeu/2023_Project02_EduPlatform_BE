@@ -4,6 +4,7 @@ import com.kits_internship.edu_flatform.entity.RoleName;
 import com.kits_internship.edu_flatform.entity.StatusName;
 import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.entity.UserEntity;
+import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.model.request.ActiveAccountRequest;
 import com.kits_internship.edu_flatform.model.request.LoginRequest;
@@ -16,6 +17,8 @@ import com.kits_internship.edu_flatform.service.TeacherService;
 import com.kits_internship.edu_flatform.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,14 +51,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     @Autowired
     private JwtProvider jwtProvider;
 
-    private static final int OPT = 123456;
-
+    private static final int OTP = 123456;
     @Override
     public UserEntity createAccount(UserEntity userEntity) {
         Map<String, Object> errors = new HashMap<>();
-        UserEntity existUser = findByEmail(userEntity.getEmail());
-        if (existUser != null) {
-            errors.put("user", "Email existed!");
+        UserEntity existUser = userRepository.findByEmailOrUsername(userEntity.getEmail(),userEntity.getUsername());
+        if (existUser != null ) {
+            errors.put("user", "Email or Username existed!");
             throw new UnprocessableEntityException(errors);
         }
         userEntity.setStatus(StatusName.INACTIVE);
@@ -74,13 +76,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
 
     @Override
     @Transactional
-    public ActiveAccountResponse activeAccount(ActiveAccountRequest activeAccountRequest) {
+    public ResponseEntity activeAccount(ActiveAccountRequest activeAccountRequest) {
         Map<String, Object> errors = new HashMap<>();
 
-        UserEntity userEntity = findByEmail(activeAccountRequest.getEmail());
-        ActiveAccountResponse response = new ActiveAccountResponse();
         try {
-            if (userEntity != null && userEntity.getStatus().equals(StatusName.INACTIVE) && activeAccountRequest.getOpt() == OPT) {
+            ActiveAccountResponse response = new ActiveAccountResponse();
+            UserEntity userEntity = findByEmail(activeAccountRequest.getEmail());
+            if (userEntity != null && userEntity.getStatus().equals(StatusName.INACTIVE) && activeAccountRequest.getOpt() == OTP) {
                 if (userEntity.getRole().equals(RoleName.ROLE_TEACHER)) {
                     userEntity.setPassword(encoder.encode(activeAccountRequest.getPassword()));
                     userEntity.setStatus(StatusName.ACTIVE);
@@ -96,36 +98,37 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
                 if (userEntity.getRole().equals(RoleName.ROLE_STUDENT)) {
 
                 }
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            } else {
+                throw new NotFoundException("Invalid Request!");
             }
-
         } catch (Exception e) {
             errors.put("user", e.getMessage());
             throw new UnprocessableEntityException(errors);
         }
-        return response;
     }
 
     @Override
     public LoginResponse login(LoginRequest request) {
         Map<String, Object> errors = new HashMap<>();
 
-        UserEntity userEntity = findByEmail(request.getEmail());
-        if (userEntity == null) {
-            errors.put("user", "Not found!");
-            throw new UnprocessableEntityException(errors);
+        Optional<UserEntity> userEntity = userRepository.findByUsername(request.getUsername());
+        if (userEntity.isEmpty()) {
+            errors.put("user", "Not found Username!");
+            throw new NotFoundException(errors);
         }
-        if(userEntity.getStatus().equals(StatusName.INACTIVE)){
+        if(userEntity.get().getStatus().equals(StatusName.INACTIVE)){
             errors.put("user", "Invalid user!");
             throw new UnprocessableEntityException(errors);
         }
         LoginResponse loginResponse = new LoginResponse();
         try {
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword());
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
             Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             UserPrinciple user = (UserPrinciple) authentication.getPrincipal();
             String jwt = jwtProvider.generateToken(user);
-            loginResponse.setEmail(user.getEmail());
+            loginResponse.setEmail(userEntity.get().getEmail());
             loginResponse.setToken(jwt);
         } catch (Exception e) {
             errors.put("user", "Username or Password invalid!");

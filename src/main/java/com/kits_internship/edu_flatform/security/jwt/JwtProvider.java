@@ -68,7 +68,7 @@ public class JwtProvider implements Serializable {
     private String createToken(Map<String, Object> claims, UserPrinciple user) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(user.getEmail())
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();

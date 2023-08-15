@@ -27,6 +27,12 @@ public class ApiExceptionController {
         return ResponseEntity.badRequest().body(buildSuccessFailed(400, ((UnprocessableEntityException) ex).getMessageResult()));
     }
 
+    @ExceptionHandler(NotFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ResponseEntity<Object> notFoundEntityExceptionException(Exception ex, WebRequest request) {
+        return ResponseEntity.badRequest().body(buildSuccessFailed(404, ((UnprocessableEntityException) ex).getMessageResult()));
+    }
+
     private static JSONObject buildSuccessFailed(int status, Object result) {
         log.error(String.valueOf(result));
         JSONObject response = new JSONObject();

@@ -10,6 +10,7 @@ import com.kits_internship.edu_flatform.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,6 @@ public class UserController {
     @Autowired
     ModelMapper modelMapper;
 
-
     @PostMapping("/register")
     private RegisterModel addAccount(@RequestBody RegisterModel request) {
         UserEntity userMapper = modelMapper.map(request, UserEntity.class);
@@ -34,8 +34,8 @@ public class UserController {
     }
 
     @PostMapping("/activeAccount")
-    private ActiveAccountResponse activeAccount(@RequestBody ActiveAccountRequest request) {
-        ActiveAccountResponse response = userService.activeAccount(request);
+    private ResponseEntity activeAccount(@RequestBody ActiveAccountRequest request) {
+        ResponseEntity response = userService.activeAccount(request);
         return response;
     }
 

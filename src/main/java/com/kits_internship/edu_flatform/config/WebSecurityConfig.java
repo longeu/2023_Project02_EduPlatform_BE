@@ -52,7 +52,7 @@ public class WebSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests().requestMatchers("/api/user/register", "/api/user/login","/api/user/activeAccount").permitAll();
         http.authorizeHttpRequests().requestMatchers("/api/teacher/**").hasAuthority(String.valueOf(RoleName.ROLE_TEACHER));
-        http.authorizeHttpRequests().requestMatchers("/api/student/**").hasAuthority(String.valueOf(RoleName.ROLE_TEACHER));
+        http.authorizeHttpRequests().requestMatchers("/api/student/**").hasAuthority(String.valueOf(RoleName.ROLE_STUDENT));
         http.authorizeHttpRequests().anyRequest().authenticated();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().authenticationProvider(authenticationProvider());

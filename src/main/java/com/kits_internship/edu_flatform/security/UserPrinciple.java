@@ -20,7 +20,7 @@ public class UserPrinciple implements UserDetails {
 
     private Long id;
 
-    private String email;
+    private String username;
 
     @JsonIgnore
     private String password;
@@ -28,10 +28,10 @@ public class UserPrinciple implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
     private Set<String> roles;
 
-    public UserPrinciple(Long id, String email, String password,
+    public UserPrinciple(Long id, String username, String password,
                          Collection<? extends GrantedAuthority> authorities, Set<String> roles) {
         this.id = id;
-        this.email = email;
+        this.username = username;
         this.password = password;
         this.authorities = authorities;
         this.roles = roles;
@@ -41,7 +41,7 @@ public class UserPrinciple implements UserDetails {
         List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         return new UserPrinciple(
                 entity.getId(),
-                entity.getEmail(),
+                entity.getUsername(),
                 entity.getPassword(),
                 authorities,
                 roles
@@ -54,10 +54,6 @@ public class UserPrinciple implements UserDetails {
         return authorities;
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
     @Override
     public String getPassword() {
         return password;
