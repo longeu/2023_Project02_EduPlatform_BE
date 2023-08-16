@@ -11,6 +11,7 @@ import com.kits_internship.edu_flatform.repository.OtpRepository;
 import com.kits_internship.edu_flatform.repository.UserRepository;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.security.jwt.JwtService;
+import com.kits_internship.edu_flatform.service.StudentService;
 import com.kits_internship.edu_flatform.service.TeacherService;
 import com.kits_internship.edu_flatform.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -50,6 +51,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     private JwtService jwtService;
     @Autowired
     private OtpRepository otpRepository;
+    @Autowired
+    private StudentService studentService;
 
     private static final String OTP = "123456";
     private static final long OTP_VALID_DURATION = 5 * 60 * 1000;   // 5 minutes
@@ -101,22 +104,24 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
             UserEntity userEntity = findByEmail(activeAccountRequest.getEmail());
 
             if (userEntity != null && userEntity.getStatus().equals(StatusName.INACTIVE) && activeAccountRequest.getOpt().equals(otpEntity.getOpt())) {
+                userEntity.setPassword(encoder.encode(activeAccountRequest.getPassword()));
+                userEntity.setStatus(StatusName.ACTIVE);
                 if (userEntity.getRole().equals(RoleName.ROLE_TEACHER)) {
-                    userEntity.setPassword(encoder.encode(activeAccountRequest.getPassword()));
-                    userEntity.setStatus(StatusName.ACTIVE);
-                    update(userEntity.getId(), userEntity);
-
                     TeacherEntity teacherMapper = modelMapper.map(userEntity, TeacherEntity.class);
                     teacherMapper.setUser(userEntity);
                     TeacherEntity teacherEntity = teacherService.register(teacherMapper);
-
                     response = modelMapper.map(teacherEntity, ActiveAccountResponse.class);
-                    response.setRole(RoleName.ROLE_TEACHER);
                 }
                 if (userEntity.getRole().equals(RoleName.ROLE_STUDENT)) {
-
+                    StudentEntity studentMapper = modelMapper.map(userEntity, StudentEntity.class);
+                    studentMapper.setUser(userEntity);
+                    StudentEntity studentEntity = studentService.register(studentMapper);
+                    response = modelMapper.map(studentEntity, ActiveAccountResponse.class);
                 }
+                update(userEntity.getId(), userEntity);
                 otpRepository.delete(otpEntity);
+
+                response.setRole(userEntity.getRole());
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
                 throw new NotFoundException("Invalid Request!");

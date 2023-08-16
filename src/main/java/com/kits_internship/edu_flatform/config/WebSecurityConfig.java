@@ -20,13 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +31,7 @@ public class WebSecurityConfig {
     private JwtAuthFilter authFilter;
 
     @Autowired
-    AuthWhitelistFilter authWhitelistFilter;
+    AuthListFilter authListFilter;
 
     @Bean
     //authentication
@@ -61,9 +56,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers(AuthWhitelistFilter.AUTH_WHITE_LIST).permitAll());
+                .requestMatchers(AuthListFilter.AUTH_WHITE_LIST).permitAll());
 
-        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/teacher/**")
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.TEACHER_LIST)
                 .hasAuthority(String.valueOf(RoleName.ROLE_TEACHER)));
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/student/**")
                 .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));

@@ -9,16 +9,14 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TeacherResponse {
+public class StudentResponse {
     private String email;
     private String phone;
+    private String image;
     private String firstName;
     private String lastName;
-    private String image;
-    private String bio;
-    private String link;
-    private List<String> certificates;
-    private String experience;
+    private String description;
+
     private Long userID;
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;

@@ -16,8 +16,8 @@ import java.util.Date;
 public class CategoryEntity extends BaseEntity {
     private String name;
     private String description;
-    private int status;
-
+    @Enumerated(EnumType.STRING)
+    private StatusName status;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
@@ -25,6 +25,5 @@ public class CategoryEntity extends BaseEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-
     private Date modifiedDate;
 }
