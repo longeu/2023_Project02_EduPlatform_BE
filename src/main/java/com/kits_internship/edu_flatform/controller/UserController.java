@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,5 +40,17 @@ public class UserController {
     private LoginResponse login(@RequestBody LoginRequest request) {
         LoginResponse response = userService.login(request);
         return response;
+    }
+
+    @PostMapping("/forgotPassword")
+    private ResponseEntity forgotPassword(@RequestParam String email){
+        ResponseEntity responseEntity = userService.forgotPassword(email);
+        return responseEntity;
+    }
+
+    @PostMapping("/resetPassword")
+    private ResponseEntity resetPassword(@RequestBody ActiveAccountRequest request){
+        ResponseEntity responseEntity = userService.resetPassword(request);
+        return responseEntity;
     }
 }

@@ -55,11 +55,13 @@ public class WebSecurityConfig {
         http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(AuthWhitelistFilter.AUTH_WHITE_LIST).permitAll());
+
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/teacher/**")
                 .hasAuthority(String.valueOf(RoleName.ROLE_TEACHER)));
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/student/**")
                 .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
         http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
+
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);

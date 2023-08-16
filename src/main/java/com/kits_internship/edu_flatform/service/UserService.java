@@ -18,4 +18,8 @@ public interface UserService extends BaseService<UserEntity> {
     LoginResponse login(LoginRequest request);
 
     UserEntity findByUsername(String token);
+
+    ResponseEntity forgotPassword(String email);
+
+    ResponseEntity resetPassword(ActiveAccountRequest request);
 }

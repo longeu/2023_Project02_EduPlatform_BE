@@ -1,22 +1,18 @@
 package com.kits_internship.edu_flatform.service.impl;
 
-import com.kits_internship.edu_flatform.entity.RoleName;
-import com.kits_internship.edu_flatform.entity.StatusName;
-import com.kits_internship.edu_flatform.entity.TeacherEntity;
-import com.kits_internship.edu_flatform.entity.UserEntity;
+import com.kits_internship.edu_flatform.entity.*;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.model.request.ActiveAccountRequest;
 import com.kits_internship.edu_flatform.model.request.LoginRequest;
 import com.kits_internship.edu_flatform.model.response.ActiveAccountResponse;
 import com.kits_internship.edu_flatform.model.response.LoginResponse;
+import com.kits_internship.edu_flatform.repository.OtpRepository;
 import com.kits_internship.edu_flatform.repository.UserRepository;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.security.jwt.JwtService;
 import com.kits_internship.edu_flatform.service.TeacherService;
 import com.kits_internship.edu_flatform.service.UserService;
-import io.jsonwebtoken.Claims;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -51,18 +48,30 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private OtpRepository otpRepository;
 
-    private static final int OTP = 123456;
+    private static final String OTP = "123456";
+    private static final long OTP_VALID_DURATION = 5 * 60 * 1000;   // 5 minutes
+
     @Override
     public UserEntity createAccount(UserEntity userEntity) {
         Map<String, Object> errors = new HashMap<>();
-        UserEntity existUser = userRepository.findByEmailOrUsername(userEntity.getEmail(),userEntity.getUsername());
-        if (existUser != null ) {
+        UserEntity existUser = userRepository.findByEmailOrUsername(userEntity.getEmail(), userEntity.getUsername());
+        if (existUser != null) {
             errors.put("user", "Email or Username existed!");
             throw new UnprocessableEntityException(errors);
         }
         userEntity.setStatus(StatusName.INACTIVE);
         UserEntity response = create(userEntity);
+        //OTP create
+        OtpEntity otpEntity = new OtpEntity();
+        otpEntity.setEmail(userEntity.getEmail());
+        otpEntity.setOpt(OTP);
+        otpEntity.setExpiredDate(new Timestamp(System.currentTimeMillis() + OTP_VALID_DURATION));
+        otpEntity.setType(OtpType.ACTIVE_ACCOUNT);
+        otpRepository.save(otpEntity);
+
         return response;
     }
 
@@ -82,8 +91,16 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
 
         try {
             ActiveAccountResponse response = new ActiveAccountResponse();
+
+            Optional<OtpEntity> optionalOtpEntity = otpRepository.findByEmail(activeAccountRequest.getEmail());
+            OtpEntity otpEntity = optionalOtpEntity.orElseThrow();
+            long currentTimeInMillis = System.currentTimeMillis();
+            if (otpEntity.getExpiredDate().getTime() < currentTimeInMillis) {
+                throw new UnprocessableEntityException("OTP has Expired!");
+            }
             UserEntity userEntity = findByEmail(activeAccountRequest.getEmail());
-            if (userEntity != null && userEntity.getStatus().equals(StatusName.INACTIVE) && activeAccountRequest.getOpt() == OTP) {
+
+            if (userEntity != null && userEntity.getStatus().equals(StatusName.INACTIVE) && activeAccountRequest.getOpt().equals(otpEntity.getOpt())) {
                 if (userEntity.getRole().equals(RoleName.ROLE_TEACHER)) {
                     userEntity.setPassword(encoder.encode(activeAccountRequest.getPassword()));
                     userEntity.setStatus(StatusName.ACTIVE);
@@ -99,6 +116,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
                 if (userEntity.getRole().equals(RoleName.ROLE_STUDENT)) {
 
                 }
+                otpRepository.delete(otpEntity);
                 return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
                 throw new NotFoundException("Invalid Request!");
@@ -118,7 +136,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
             errors.put("user", "Not found Username!");
             throw new NotFoundException(errors);
         }
-        if(userEntity.get().getStatus().equals(StatusName.INACTIVE)){
+        if (userEntity.get().getStatus().equals(StatusName.INACTIVE)) {
             errors.put("user", "Invalid user!");
             throw new UnprocessableEntityException(errors);
         }
@@ -130,6 +148,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
             UserPrinciple user = (UserPrinciple) authentication.getPrincipal();
             String jwt = jwtService.generateToken(user);
             loginResponse.setUsername(user.getUsername());
+            loginResponse.setRole(userEntity.get().getRole());
             loginResponse.setToken(jwt);
         } catch (Exception e) {
             errors.put("user", "Username or Password invalid!");
@@ -142,10 +161,44 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     public UserEntity findByUsername(String username) {
 
         Optional<UserEntity> userEntity = userRepository.findByUsername(username);
-        if (userEntity.isEmpty()) {
-            return null;
+        return userEntity.orElse(null);
+    }
+
+    @Override
+    public ResponseEntity forgotPassword(String email) {
+        OtpEntity otpEntity = new OtpEntity();
+        otpEntity.setEmail(email);
+        otpEntity.setOpt(OTP);
+        otpEntity.setExpiredDate(new Timestamp(System.currentTimeMillis() + OTP_VALID_DURATION));
+        otpEntity.setType(OtpType.RESET_PASSWORD);
+        otpRepository.save(otpEntity);
+        return ResponseEntity.status(HttpStatus.OK).body("Success!");
+    }
+
+    @Override
+    public ResponseEntity resetPassword(ActiveAccountRequest request) {
+        Map<String, Object> errors = new HashMap<>();
+        try {
+            Optional<OtpEntity> optionalOtpEntity = otpRepository.findByEmail(request.getEmail());
+            OtpEntity otpEntity = optionalOtpEntity.orElseThrow();
+            long currentTimeInMillis = System.currentTimeMillis();
+            if (otpEntity.getExpiredDate().getTime() < currentTimeInMillis) {
+                throw new UnprocessableEntityException("OTP has Expired!");
+            }
+            UserEntity userEntity = findByEmail(request.getEmail());
+            if (userEntity != null && request.getOpt().equals(otpEntity.getOpt())) {
+                userEntity.setPassword(encoder.encode(request.getPassword()));
+                userEntity.setModifiedDate(new Timestamp(currentTimeInMillis));
+                userRepository.save(userEntity);
+                otpRepository.delete(otpEntity);
+                return ResponseEntity.status(HttpStatus.OK).body("Success!");
+            } else {
+                throw new NotFoundException("Invalid Request!");
+            }
+        } catch (Exception e) {
+            errors.put("user", e.getMessage());
+            throw new UnprocessableEntityException(errors);
         }
-        return userEntity.get();
     }
 
 }

@@ -14,8 +14,8 @@ public class ActiveAccountRequest {
     @NotBlank
     private String email;
     @Size(max = 6)
-    @NotNull
-    private int opt;
+    @NotBlank
+    private String opt;
     @NotBlank
     private String password;
 }

@@ -11,6 +11,8 @@ public class AuthWhitelistFilter {
             "/swagger-ui.html",
             "/api/user/register",
             "/api/user/login",
-            "/api/user/activeAccount"
+            "/api/user/activeAccount",
+            "/api/user/forgotPassword",
+            "/api/user/resetPassword"
     };
 }
