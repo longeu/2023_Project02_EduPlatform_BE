@@ -20,6 +20,10 @@ public class UserPrinciple implements UserDetails {
 
     private Long id;
 
+    private Long studentID;
+
+    private Long teacherID;
+
     private String username;
 
     @JsonIgnore
@@ -27,20 +31,24 @@ public class UserPrinciple implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrinciple(Long id, String username, String password,
+    public UserPrinciple(Long id, String username, String password, Long studentID, Long teacherID,
                          Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.studentID = studentID;
+        this.teacherID = teacherID;
         this.authorities = authorities;
     }
 
-    public static UserPrinciple build(UserEntity entity, Set<String> roles) {
+    public static UserPrinciple build(UserEntity entity, Set<String> roles, Long studentID, Long teacherID) {
         List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
         return new UserPrinciple(
                 entity.getId(),
                 entity.getUsername(),
                 entity.getPassword(),
+                studentID,
+                teacherID,
                 authorities
         );
     }

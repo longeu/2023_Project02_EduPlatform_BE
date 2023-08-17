@@ -77,6 +77,8 @@ public class JwtService implements Serializable {
     public String generateToken(UserPrinciple user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+        claims.put("studentID",user.getStudentID());
+        claims.put("teacherID",user.getTeacherID());
         return createToken(claims, user);
     }
 

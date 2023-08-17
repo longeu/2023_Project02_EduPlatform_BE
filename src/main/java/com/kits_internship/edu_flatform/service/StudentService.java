@@ -5,7 +5,7 @@ import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.model.request.StudentRequest;
 import com.kits_internship.edu_flatform.model.request.TeacherRequest;
 
-public interface StudentService extends BaseService<StudentEntity> {
+public interface StudentService {
     StudentEntity register(StudentEntity studentEntity);
 
     StudentEntity getStudentInfo(String tokenHeader);

@@ -1,31 +1,32 @@
-package com.kits_internship.edu_flatform.model.response;
+package com.kits_internship.edu_flatform.model.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kits_internship.edu_flatform.entity.CategoryEntity;
 import com.kits_internship.edu_flatform.entity.StatusName;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Getter
 @Setter
-public class CourseResponse {
+public class CourseRequest {
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
+    @NotBlank
     private String objectives;
+    @NotBlank
     private String target;
+    @NotBlank
     private String image;
-    private StatusName status;
+    @NotNull
     private BigDecimal price;
-    private Long teacherID;
+    @NotNull
     private Long categoryID;
 
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private Date createdDate;
-
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private Date modifiedDate;
 }

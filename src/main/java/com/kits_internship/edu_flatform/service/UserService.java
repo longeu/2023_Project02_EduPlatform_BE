@@ -8,7 +8,7 @@ import com.kits_internship.edu_flatform.model.response.LoginResponse;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.ResponseEntity;
 
-public interface UserService extends BaseService<UserEntity> {
+public interface UserService {
     UserEntity createAccount(UserEntity userEntity);
 
     UserEntity findByEmail(String email);

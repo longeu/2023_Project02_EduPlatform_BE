@@ -1,5 +1,6 @@
 package com.kits_internship.edu_flatform.service.impl;
 
+import com.kits_internship.edu_flatform.config.DateConfig;
 import com.kits_internship.edu_flatform.entity.*;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
@@ -32,10 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository> implements UserService {
-    public UserServiceImpl(UserRepository jpaRepository) {
-        super(jpaRepository);
-    }
+public class UserServiceImpl implements UserService {
 
     @Autowired
     UserRepository userRepository;
@@ -53,6 +51,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     private OtpRepository otpRepository;
     @Autowired
     private StudentService studentService;
+    @Autowired
+    DateConfig dateConfig;
 
     private static final String OTP = "123456";
     private static final long OTP_VALID_DURATION = 5 * 60 * 1000;   // 5 minutes
@@ -66,7 +66,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
             throw new UnprocessableEntityException(errors);
         }
         userEntity.setStatus(StatusName.INACTIVE);
-        UserEntity response = create(userEntity);
+        userEntity.setCreatedDate(dateConfig.getTimestamp());
+        userEntity.setModifiedDate(dateConfig.getTimestamp());
+        UserEntity response = userRepository.save(userEntity);
         //OTP create
         OtpEntity otpEntity = new OtpEntity();
         otpEntity.setEmail(userEntity.getEmail());
@@ -118,7 +120,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
                     StudentEntity studentEntity = studentService.register(studentMapper);
                     response = modelMapper.map(studentEntity, ActiveAccountResponse.class);
                 }
-                update(userEntity.getId(), userEntity);
+                userEntity.setModifiedDate(dateConfig.getTimestamp());
+                userRepository.save(userEntity);
                 otpRepository.delete(otpEntity);
 
                 response.setRole(userEntity.getRole());

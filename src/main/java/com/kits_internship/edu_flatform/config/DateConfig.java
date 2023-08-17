@@ -11,7 +11,7 @@ import java.util.Date;
 @Configuration
 public class DateConfig {
     @Bean
-    public static Timestamp getTimestamp() {
+    public Timestamp getTimestamp() {
         return new Timestamp(System.currentTimeMillis());
     }
 

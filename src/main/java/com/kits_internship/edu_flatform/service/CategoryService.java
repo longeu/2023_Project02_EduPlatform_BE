@@ -5,12 +5,17 @@ import com.kits_internship.edu_flatform.model.base.ListResponseModel;
 import com.kits_internship.edu_flatform.model.request.CategoryFilterRequest;
 import com.kits_internship.edu_flatform.model.request.CategoryRequest;
 import com.kits_internship.edu_flatform.model.response.CategoryResponse;
+import com.kits_internship.edu_flatform.security.UserPrinciple;
+
+import java.util.Optional;
 
 public interface CategoryService extends BaseService<CategoryEntity> {
 
-    CategoryResponse addCategory(CategoryRequest request);
+    CategoryResponse addByCurrentUser(CategoryRequest request, Optional<UserPrinciple> user);
 
-    CategoryResponse updateCategory(Long id, CategoryRequest request);
+    CategoryResponse updateByCurrentUser(Long id, CategoryRequest request, Optional<UserPrinciple> user);
 
-    ListResponseModel filter(CategoryFilterRequest categoryFilter);
+    ListResponseModel filterByCurrentUser(CategoryFilterRequest categoryFilter, Optional<UserPrinciple> user);
+
+    Optional<CategoryEntity> findByIdAndCurrentUser(Long id, Optional<UserPrinciple> user);
 }

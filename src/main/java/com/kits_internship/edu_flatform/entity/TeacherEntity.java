@@ -32,7 +32,6 @@ public class TeacherEntity extends BaseEntity {
     @JoinColumn(name = "userID")
     private UserEntity user;
 
-
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
@@ -43,7 +42,10 @@ public class TeacherEntity extends BaseEntity {
     private Date modifiedDate;
 
     @OneToMany(mappedBy = "teacher")
-    private List<CourseEntity> createdCourses = new ArrayList<>();
+    private List<CourseEntity> courses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "teacher")
+    private List<CategoryEntity> category = new ArrayList<>();
 
     @OneToMany(mappedBy = "teacher")
     private List<DiscussionDetailEntity> discussion = new ArrayList<>();

@@ -26,4 +26,8 @@ public class CategoryEntity extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date modifiedDate;
+
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @JoinColumn(name = "teacherID")
+    private TeacherEntity teacher;
 }

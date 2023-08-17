@@ -1,16 +1,16 @@
 package com.kits_internship.edu_flatform.service.impl;
 
+import com.kits_internship.edu_flatform.config.DateConfig;
 import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.entity.UserEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.model.request.TeacherRequest;
-import com.kits_internship.edu_flatform.model.response.TeacherResponse;
 import com.kits_internship.edu_flatform.repository.TeacherRepository;
 import com.kits_internship.edu_flatform.repository.UserRepository;
+import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.security.jwt.JwtService;
 import com.kits_internship.edu_flatform.service.TeacherService;
-import io.jsonwebtoken.Claims;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,8 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
     UserRepository userRepository;
     @Autowired
     ModelMapper modelMapper;
+    @Autowired
+    DateConfig dateConfig;
 
     public TeacherServiceImpl(TeacherRepository jpaRepository) {
         super(jpaRepository);
@@ -44,31 +46,35 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
             errors.put("teacher", "existed!");
             throw new UnprocessableEntityException(errors);
         }
-        return create(teacherEntity);
+        teacherEntity.setCreatedDate(dateConfig.getTimestamp());
+        teacherEntity.setModifiedDate(dateConfig.getTimestamp());
+        TeacherEntity response = teacherRepository.save(teacherEntity);
+        return response;
     }
 
     @Override
-    public TeacherEntity getTeacherInfo(String token) {
+    public TeacherEntity getTeacherInfo(Optional<UserPrinciple> user) {
         Map<String, Object> errors = new HashMap<>();
-        String jwt = token.replace("Bearer ", "");
-        Claims claims = jwtService.extractAllClaims(jwt);
-        String username = claims.getSubject();
-        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
-        if(userEntity.isEmpty()){
-            errors.put("user","Not found user!");
+        try {
+            UserPrinciple userPrinciple = user.orElseThrow();
+            Optional<UserEntity> userEntity = userRepository.findByUsername(userPrinciple.getUsername());
+            if (userEntity.isEmpty()) {
+                throw new NotFoundException("Not found user!");
+            }
+            TeacherEntity teacherEntity = teacherRepository.findByUserID(userEntity.get().getId());
+            if (teacherEntity == null) {
+                throw new NotFoundException("Not Found Teacher!");
+            }
+            return teacherEntity;
+        } catch (Exception e) {
+            errors.put("base", e.getMessage());
             throw new NotFoundException(errors);
         }
-        TeacherEntity teacherEntity = teacherRepository.findByUserID(userEntity.get().getId());
-        if(teacherEntity == null){
-            errors.put("teacher", "Not Found Teacher!");
-            throw new NotFoundException(errors);
-        }
-        return teacherEntity;
     }
 
     @Override
-    public TeacherEntity updateInfo(TeacherRequest request, String token) {
-        TeacherEntity teacherEntity = getTeacherInfo(token);
+    public TeacherEntity updateInfo(TeacherRequest request, Optional<UserPrinciple> user) {
+        TeacherEntity teacherEntity = getTeacherInfo(user);
         teacherEntity.setPhone(request.getPhone());
         teacherEntity.setEmail(request.getEmail());
         teacherEntity.setBio(request.getBio());
@@ -78,7 +84,7 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
         teacherEntity.setLastName(request.getLastName());
         teacherEntity.setLink(request.getLink());
         teacherEntity.setImage(request.getImage());
-        teacherEntity.setModifiedDate(new Timestamp(System.currentTimeMillis()));
+        teacherEntity.setModifiedDate(dateConfig.getTimestamp());
 
         teacherRepository.save(teacherEntity);
         return teacherEntity;

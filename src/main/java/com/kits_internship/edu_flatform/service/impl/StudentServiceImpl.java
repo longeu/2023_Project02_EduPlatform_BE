@@ -1,5 +1,6 @@
 package com.kits_internship.edu_flatform.service.impl;
 
+import com.kits_internship.edu_flatform.config.DateConfig;
 import com.kits_internship.edu_flatform.entity.StudentEntity;
 import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.entity.UserEntity;
@@ -24,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRepository> implements StudentService {
+public class StudentServiceImpl implements StudentService {
 
     @Autowired
     StudentRepository studentRepository;
@@ -34,10 +35,8 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
     UserRepository userRepository;
     @Autowired
     ModelMapper modelMapper;
-
-    public StudentServiceImpl(StudentRepository jpaRepository) {
-        super(jpaRepository);
-    }
+    @Autowired
+    DateConfig dateConfig;
 
     @Override
     public StudentEntity register(StudentEntity studentEntity) {
@@ -47,7 +46,9 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
             errors.put("Student", "existed!");
             throw new UnprocessableEntityException(errors);
         }
-        return create(studentEntity);
+        studentEntity.setCreatedDate(dateConfig.getTimestamp());
+        studentEntity.setModifiedDate(dateConfig.getTimestamp());
+        return studentRepository.save(studentEntity);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
     public StudentEntity updateInfo(StudentRequest request, String token) {
         StudentEntity studentEntity = getStudentInfo(token);
         studentEntity = modelMapper.map(request, StudentEntity.class);
-        studentEntity.setModifiedDate(new Timestamp(System.currentTimeMillis()));
+        studentEntity.setModifiedDate(dateConfig.getTimestamp());
 
         studentRepository.save(studentEntity);
         return studentEntity;

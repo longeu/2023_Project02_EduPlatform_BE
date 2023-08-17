@@ -1,13 +1,20 @@
 package com.kits_internship.edu_flatform.service.impl;
 
 import com.kits_internship.edu_flatform.config.DateConfig;
+import com.kits_internship.edu_flatform.entity.RoleName;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
+import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.repository.BaseRepository;
+import com.kits_internship.edu_flatform.repository.StudentRepository;
+import com.kits_internship.edu_flatform.repository.TeacherRepository;
+import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.service.BaseService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -16,10 +23,11 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 public abstract class BaseServiceImpl<T, R extends BaseRepository<T, Long>> implements BaseService<T> {
 
-    private final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
     protected final R jpaRepository;
+    protected final Map<String, Object> errors = new HashMap<>();
 
     @Override
     public T create(T t) {
@@ -27,10 +35,10 @@ public abstract class BaseServiceImpl<T, R extends BaseRepository<T, Long>> impl
             t.getClass().getMethod("setCreatedDate", Date.class).invoke(t, new Timestamp(System.currentTimeMillis()));
             t.getClass().getMethod("setModifiedDate", Date.class).invoke(t, new Timestamp(System.currentTimeMillis()));
             T result = jpaRepository.save(t);
-            logger.info("id: {}", result.getClass().getMethod("getId").invoke(result));
+            log.info("id: {}", result.getClass().getMethod("getId").invoke(result));
             return result;
         } catch (Exception e) {
-            logger.error("Error creating: {}", e.getMessage());
+            log.error("baseServiceImpl: {}", e.getMessage());
             return null;
         }
     }
@@ -42,11 +50,12 @@ public abstract class BaseServiceImpl<T, R extends BaseRepository<T, Long>> impl
             t.getClass().getMethod("setModifiedDate", Date.class).invoke(t,
                     result.getClass().getMethod("getCreatedDate").invoke(result));
             t.getClass().getMethod("setModifiedDate", Date.class).invoke(t, new Timestamp(System.currentTimeMillis()));
-            logger.info("id: {}", t.getClass().getMethod("getCreatedDate").invoke(t));
+            log.info("id: {}", t.getClass().getMethod("getCreatedDate").invoke(t));
             return jpaRepository.save(t);
         } catch (Exception e) {
-            logger.error("Error updating: {}", e.getMessage());
-            throw new EntityNotFoundException(e.getMessage());
+            log.error("baseServiceImpl: {}", e.getMessage());
+            errors.put("baseServiceImpl", e.getMessage());
+            throw new UnprocessableEntityException(errors);
         }
     }
 
@@ -60,20 +69,19 @@ public abstract class BaseServiceImpl<T, R extends BaseRepository<T, Long>> impl
             }
             return false;
         } catch (Exception e) {
-            logger.error("Error deleting: {}", e.getMessage());
+            log.error("baseServiceImpl: {}", e.getMessage());
             return false;
         }
     }
 
-
     @Override
     public T findById(Long id) {
-        Map<String, Object> errors = new HashMap<>();
         try {
             Optional<T> result = jpaRepository.findById(id);
             return result.orElse(null);
         } catch (Exception e) {
-            errors.put("errors", e.getMessage());
+            log.error("baseServiceImpl: {}", e.getMessage());
+            errors.put("baseServiceImpl", e.getMessage());
             throw new NotFoundException(errors);
         }
     }
