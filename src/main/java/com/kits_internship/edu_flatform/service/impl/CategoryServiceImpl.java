@@ -18,14 +18,12 @@ import com.kits_internship.edu_flatform.service.TeacherService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,11 +70,23 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
 
     @Override
     public ListResponseModel filterByCurrentUser(CategoryFilterRequest categoryFilter, Optional<UserPrinciple> user) {
-        Page<CategoryEntity> categoryEntities = categoryRepository.filter(
-                user.get().getTeacherID(),
-                categoryFilter.getName(),
-                categoryFilter.getStatus(),
-                PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+        List<CategoryEntity> emptyList = new ArrayList<>();
+        Page<CategoryEntity> categoryEntities = new PageImpl<>(emptyList);
+
+        String role = user.get().getAuthorities().stream().findAny().get().getAuthority();
+        if (role.equals(String.valueOf(RoleName.ROLE_TEACHER)) && user.get().getTeacherID() != null) {
+            categoryEntities = categoryRepository.filter(
+                    user.get().getTeacherID(),
+                    categoryFilter.getName(),
+                    categoryFilter.getStatus(),
+                    PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+        } else if(role.equals(String.valueOf(RoleName.ROLE_STUDENT))) {
+            categoryEntities = categoryRepository.filter(
+                    null,
+                    categoryFilter.getName(),
+                    categoryFilter.getStatus(),
+                    PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+        }
 
         ListResponseModel responses = new ListResponseModel();
         List<CategoryResponse> responseList = categoryEntities.stream().map(categoryEntity -> modelMapper.map(categoryEntity, CategoryResponse.class)).collect(Collectors.toList());

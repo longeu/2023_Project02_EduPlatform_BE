@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CourseFilterRequest extends BasePagingQueryRequest {
-    private String name;
+    private String keyword;
+    private Long categoryID;
     private StatusName status;
 }
