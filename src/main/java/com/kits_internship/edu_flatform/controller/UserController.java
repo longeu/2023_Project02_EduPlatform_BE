@@ -1,11 +1,9 @@
 package com.kits_internship.edu_flatform.controller;
 
 import com.kits_internship.edu_flatform.entity.UserEntity;
-import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.model.RegisterModel;
 import com.kits_internship.edu_flatform.model.request.ActiveAccountRequest;
 import com.kits_internship.edu_flatform.model.request.LoginRequest;
-import com.kits_internship.edu_flatform.model.response.ActiveAccountResponse;
 import com.kits_internship.edu_flatform.model.response.LoginResponse;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.service.UserService;
@@ -34,6 +32,12 @@ public class UserController extends BaseController {
         UserEntity userMapper = modelMapper.map(request, UserEntity.class);
         UserEntity userEntity = userService.createAccount(userMapper,user);
         return modelMapper.map(userEntity, RegisterModel.class);
+    }
+
+    @PostMapping("/resentOTP")
+    private ResponseEntity resentOTP(@RequestParam String email) {
+        ResponseEntity response = userService.resentOTP(email);
+        return response;
     }
 
     @PostMapping("/activeAccount")

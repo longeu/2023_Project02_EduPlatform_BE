@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long>, BaseRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
 
     @Query("select t from UserEntity t where t.role = ?3 and (t.email = ?1 or t.username = ?2)")

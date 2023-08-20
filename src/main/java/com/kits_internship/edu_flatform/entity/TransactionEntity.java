@@ -22,15 +22,12 @@ public class TransactionEntity extends BaseEntity {
     private StudentEntity student;
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
-    @JoinColumn(name = "courseID")
-    private CourseEntity course;
-
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "paymentID")
     private PaymentEntity payment;
 
-    private BigDecimal total;
+    private String paymentName;
 
+    private BigDecimal total;
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")

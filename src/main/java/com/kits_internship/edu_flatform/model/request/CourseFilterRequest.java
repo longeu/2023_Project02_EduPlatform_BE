@@ -11,4 +11,5 @@ public class CourseFilterRequest extends BasePagingQueryRequest {
     private String keyword;
     private Long categoryID;
     private StatusName status;
+    private boolean registed;
 }

@@ -23,4 +23,6 @@ public interface UserService {
     ResponseEntity forgotPassword(String email);
 
     ResponseEntity resetPassword(ActiveAccountRequest request);
+
+    ResponseEntity resentOTP(String email);
 }

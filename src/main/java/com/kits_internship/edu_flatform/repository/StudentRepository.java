@@ -5,6 +5,7 @@ import com.kits_internship.edu_flatform.entity.UserEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository

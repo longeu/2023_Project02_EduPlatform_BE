@@ -18,7 +18,6 @@ import com.kits_internship.edu_flatform.service.TeacherService;
 import com.kits_internship.edu_flatform.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -35,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository> implements UserService {
 
     @Autowired
     UserRepository userRepository;
@@ -59,13 +58,17 @@ public class UserServiceImpl implements UserService {
     private static final String OTP = "123456";
     private static final long OTP_VALID_DURATION = 5 * 60 * 1000;   // 5 minutes
 
+    public UserServiceImpl(UserRepository jpaRepository) {
+        super(jpaRepository);
+    }
+
     @Override
     public UserEntity createAccount(UserEntity userEntity, Optional<UserPrinciple> user) {
         Map<String, Object> errors = new HashMap<>();
         if (user.isEmpty() && userEntity.getRole().equals(RoleName.ROLE_ADMIN)) {
             throw new UnauthorizedException();
         }
-        if (user.isPresent() && !user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN))) {
+        if (user.isPresent() && user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN))) {
             throw new UnauthorizedException();
         }
         UserEntity existUser = userRepository.findByRoleAndEmailOrUsername(userEntity.getEmail(), userEntity.getUsername(), userEntity.getRole());
@@ -215,6 +218,20 @@ public class UserServiceImpl implements UserService {
             errors.put("user", e.getMessage());
             throw new UnprocessableEntityException(errors);
         }
+    }
+
+    @Override
+    public ResponseEntity resentOTP(String email) {
+        Optional<OtpEntity> otpEntity = otpRepository.findByEmail(email);
+        otpEntity.ifPresent(entity -> otpRepository.delete(entity));
+        OtpEntity newOTP = new OtpEntity();
+        newOTP.setEmail(email);
+        newOTP.setOpt(OTP);
+        newOTP.setExpiredDate(new Timestamp(System.currentTimeMillis() + OTP_VALID_DURATION));
+        newOTP.setType(OtpType.ACTIVE_ACCOUNT);
+        otpRepository.save(newOTP);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Success!");
     }
 
 }

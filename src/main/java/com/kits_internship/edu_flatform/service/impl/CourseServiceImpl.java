@@ -7,9 +7,11 @@ import com.kits_internship.edu_flatform.entity.RoleName;
 import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnauthorizedException;
+import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.model.base.ListResponseModel;
 import com.kits_internship.edu_flatform.model.base.MetadataResponse;
 import com.kits_internship.edu_flatform.model.request.CourseFilterRequest;
+import com.kits_internship.edu_flatform.model.request.CourseTransactionRequest;
 import com.kits_internship.edu_flatform.model.request.CourseRequest;
 import com.kits_internship.edu_flatform.model.response.CourseResponse;
 import com.kits_internship.edu_flatform.repository.CourseRepository;
@@ -17,18 +19,26 @@ import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.service.CategoryService;
 import com.kits_internship.edu_flatform.service.CourseService;
 import com.kits_internship.edu_flatform.service.TeacherService;
+import com.kits_internship.edu_flatform.ulti.FileUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepository> implements CourseService {
     public CourseServiceImpl(CourseRepository jpaRepository) {
         super(jpaRepository);
@@ -44,8 +54,11 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
     TeacherService teacherService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    FileUtils fileUtils;
 
     private static final Map<String, Object> errors = new HashMap<>();
+
     @Override
     public ListResponseModel filterByCurrentUser(CourseFilterRequest request, Optional<UserPrinciple> user) {
         List<CourseEntity> emptyList = new ArrayList<>();
@@ -58,13 +71,15 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
                     request.getKeyword(),
                     request.getCategoryID(),
                     user.get().getTeacherID(),
+                    null,
                     PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
-        } else if(role.equals(String.valueOf(RoleName.ROLE_STUDENT))){
+        } else if (role.equals(String.valueOf(RoleName.ROLE_STUDENT))) {
             courseEntities = courseRepository.filter(
                     request.getStatus(),
                     request.getKeyword(),
                     request.getCategoryID(),
                     null,
+                    request.isRegisted() ? user.get().getStudentID() : null,
                     PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
         }
 
@@ -90,13 +105,13 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
             throw new UnauthorizedException();
         }
         Optional<TeacherEntity> teacherEntity = Optional.ofNullable(teacherService.findById(user.get().getTeacherID()));
-        if(teacherEntity.isEmpty()){
-            errors.put("teacher","Not found teacher");
+        if (teacherEntity.isEmpty()) {
+            errors.put("teacher", "Not found teacher");
             throw new NotFoundException(errors);
         }
         Optional<CategoryEntity> categoryEntity = categoryService.findCategoryId(request.getCategoryID());
-        if(categoryEntity.isEmpty()){
-            errors.put("category","Not found category");
+        if (categoryEntity.isEmpty()) {
+            errors.put("category", "Not found category");
             throw new NotFoundException(errors);
         }
 
@@ -132,5 +147,38 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
             throw new UnauthorizedException();
         }
         return courseRepository.findEntityByTeacherID(id, user.get().getTeacherID());
+    }
+
+    @Override
+    public ResponseEntity uploadFile(MultipartFile multipartFile, Optional<UserPrinciple> user) {
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        multipartFiles.add(multipartFile);
+        fileUtils.validateFiles(multipartFiles);
+        Map<String, Object> errors = new HashMap<>();
+        try {
+            String fileName = System.currentTimeMillis() + multipartFile.getOriginalFilename();
+
+            File file = fileUtils.convertToFile(multipartFile, fileName);
+            String FILE_URL = "";
+            if (multipartFile.getContentType().startsWith("video")) {
+                FILE_URL = fileUtils.uploadVideo(file, "video/" + fileName);
+            }
+            if (multipartFile.getContentType().startsWith("image")) {
+                FILE_URL = fileUtils.uploadVideo(file, "image/" + fileName);
+            }
+            file.delete();
+            return ResponseEntity.status(HttpStatus.OK).body(FILE_URL);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            errors.put("errors", e.getMessage());
+            errors.put("file", "files upload fail!");
+            throw new UnprocessableEntityException(errors);
+        }
+    }
+
+    @Override
+    public CourseResponse coursePay(CourseTransactionRequest request, Principal currentUser) {
+
+        return null;
     }
 }

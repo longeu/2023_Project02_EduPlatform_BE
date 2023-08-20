@@ -18,6 +18,7 @@ public interface CourseRepository extends BaseRepository<CourseEntity, Long> {
     @Query(value = "select c from CourseEntity c " +
             "where (coalesce(:categoryID,null) is null or c.category.id =:categoryID)" +
             "   and (coalesce(:teacherID,null) is null or c.teacher.id =:teacherID)" +
+            "   and (coalesce(:studentID,null) is null or c.enrolledStudents =:studentID)" +
             "   and (coalesce(:keyword) is null or :keyword = '' or" +
             "   lower(c.name) like concat('%', concat(lower(:keyword), '%')))" +
             "   and (coalesce(:status,null) is null or c.status in :status ) "
@@ -27,6 +28,7 @@ public interface CourseRepository extends BaseRepository<CourseEntity, Long> {
             @Param("keyword") String keyword,
             @Param("categoryID") Long categoryID,
             @Param("teacherID") Long teacherID,
+            @Param("studentID") Long studentID,
             Pageable pageable
     );
 
