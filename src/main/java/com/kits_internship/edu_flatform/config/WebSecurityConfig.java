@@ -60,10 +60,12 @@ public class WebSecurityConfig {
 
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.TEACHER_LIST)
                 .hasAuthority(String.valueOf(RoleName.ROLE_TEACHER)));
-        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers("/api/student/**")
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.STUDENT_LIST)
                 .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
-        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
+        http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.ADMIN_LIST)
+                .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
 
+        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);

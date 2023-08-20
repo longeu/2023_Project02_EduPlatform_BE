@@ -40,7 +40,7 @@ public class CourseController extends BaseController {
     }
 
     @GetMapping("/{id}")
-    private CourseResponse addCourse(@PathVariable Long id, Principal currentUser) {
+    private CourseResponse getById(@PathVariable Long id, Principal currentUser) {
         Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {

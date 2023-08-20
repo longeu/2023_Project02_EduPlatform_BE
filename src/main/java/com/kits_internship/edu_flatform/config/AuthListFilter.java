@@ -14,7 +14,8 @@ public class AuthListFilter {
             "/api/user/activeAccount",
             "/api/user/forgotPassword",
             "/api/user/resetPassword",
-            "/api/category/list"
+            "/api/category/list",
+            "/api/course/list"
     };
 
     public static final String[] TEACHER_LIST = {
