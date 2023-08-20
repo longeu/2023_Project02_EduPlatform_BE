@@ -13,11 +13,19 @@ public class AuthListFilter {
             "/api/user/login",
             "/api/user/activeAccount",
             "/api/user/forgotPassword",
-            "/api/user/resetPassword"
+            "/api/user/resetPassword",
+            "/api/category/list"
     };
 
     public static final String[] TEACHER_LIST = {
             "/api/teacher/**",
-            "/api/category/**"
+    };
+
+    public static final String[] STUDENT_LIST = {
+            "/api/student/**",
+    };
+
+    public static final String[] ADMIN_LIST = {
+            "/api/category/**",
     };
 }

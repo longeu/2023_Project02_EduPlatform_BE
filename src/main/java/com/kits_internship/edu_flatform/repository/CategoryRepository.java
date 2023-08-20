@@ -14,18 +14,15 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends BaseRepository<CategoryEntity, Long> {
     @Query(value = "select c from CategoryEntity c " +
-            " where (coalesce(:teacherID,null) is null or c.teacher.id =:teacherID) and " +
+            " where " +
             "   (coalesce(:name) is null or :name = '' or" +
             "   lower(c.name) like concat('%', concat(lower(:name), '%')))" +
             " and (coalesce(:status,null) is null or c.status in :status ) "
     )
     Page<CategoryEntity> filter(
-            @Param("teacherID") Long teacherID,
             @Param("name")String name,
             @Param("status")StatusName status,
             Pageable pageable
     );
 
-    @Query(value = "SELECT t FROM CategoryEntity t WHERE t.id =:id and t.teacher.id=:teacherID")
-    Optional<CategoryEntity> findEntityByTeacherID(Long id, Long teacherID);
 }

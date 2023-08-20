@@ -94,7 +94,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
             errors.put("teacher","Not found teacher");
             throw new NotFoundException(errors);
         }
-        Optional<CategoryEntity> categoryEntity = categoryService.findByIdAndCurrentUser(request.getCategoryID(), user);
+        Optional<CategoryEntity> categoryEntity = categoryService.findCategoryId(request.getCategoryID());
         if(categoryEntity.isEmpty()){
             errors.put("category","Not found category");
             throw new NotFoundException(errors);

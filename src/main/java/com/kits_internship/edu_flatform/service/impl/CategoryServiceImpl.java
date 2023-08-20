@@ -45,9 +45,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
 
     @Override
     public CategoryResponse addByCurrentUser(CategoryRequest request, Optional<UserPrinciple> user) {
+        if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN)) || user.get().getTeacherID() == null) {
+            throw new UnauthorizedException();
+        }
         CategoryEntity categoryEntity = modelMapper.map(request, CategoryEntity.class);
-        TeacherEntity teacherEntity = teacherService.getTeacherInfo(user);
-        categoryEntity.setTeacher(teacherEntity);
         categoryEntity = create(categoryEntity);
 
         return modelMapper.map(categoryEntity, CategoryResponse.class);
@@ -55,7 +56,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
 
     @Override
     public CategoryResponse updateByCurrentUser(Long id, CategoryRequest request, Optional<UserPrinciple> user) {
-        Optional<CategoryEntity> optionalCategory = findByIdAndCurrentUser(id, user);
+        if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN)) || user.get().getTeacherID() == null) {
+            throw new UnauthorizedException();
+        }
+        Optional<CategoryEntity> optionalCategory = findCategoryId(id);
         if (optionalCategory.isEmpty()) {
             errors.put("category", "Not found category");
             throw new NotFoundException(errors);
@@ -70,23 +74,10 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
 
     @Override
     public ListResponseModel filterByCurrentUser(CategoryFilterRequest categoryFilter, Optional<UserPrinciple> user) {
-        List<CategoryEntity> emptyList = new ArrayList<>();
-        Page<CategoryEntity> categoryEntities = new PageImpl<>(emptyList);
-
-        String role = user.get().getAuthorities().stream().findAny().get().getAuthority();
-        if (role.equals(String.valueOf(RoleName.ROLE_TEACHER)) && user.get().getTeacherID() != null) {
-            categoryEntities = categoryRepository.filter(
-                    user.get().getTeacherID(),
-                    categoryFilter.getName(),
-                    categoryFilter.getStatus(),
-                    PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
-        } else if(role.equals(String.valueOf(RoleName.ROLE_STUDENT))) {
-            categoryEntities = categoryRepository.filter(
-                    null,
-                    categoryFilter.getName(),
-                    categoryFilter.getStatus(),
-                    PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
-        }
+        Page<CategoryEntity> categoryEntities = categoryRepository.filter(
+                categoryFilter.getName(),
+                categoryFilter.getStatus(),
+                PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
 
         ListResponseModel responses = new ListResponseModel();
         List<CategoryResponse> responseList = categoryEntities.stream().map(categoryEntity -> modelMapper.map(categoryEntity, CategoryResponse.class)).collect(Collectors.toList());
@@ -102,11 +93,8 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
     }
 
     @Override
-    public Optional<CategoryEntity> findByIdAndCurrentUser(Long id, Optional<UserPrinciple> user) {
-        if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_TEACHER)) || user.get().getTeacherID() == null) {
-            throw new UnauthorizedException();
-        }
-        return categoryRepository.findEntityByTeacherID(id, user.get().getTeacherID());
+    public Optional<CategoryEntity> findCategoryId(Long id) {
+        return categoryRepository.findById(id);
     }
 
 }

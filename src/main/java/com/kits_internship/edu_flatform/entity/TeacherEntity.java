@@ -45,8 +45,5 @@ public class TeacherEntity extends BaseEntity {
     private List<CourseEntity> courses = new ArrayList<>();
 
     @OneToMany(mappedBy = "teacher")
-    private List<CategoryEntity> category = new ArrayList<>();
-
-    @OneToMany(mappedBy = "teacher")
     private List<DiscussionDetailEntity> discussion = new ArrayList<>();
 }

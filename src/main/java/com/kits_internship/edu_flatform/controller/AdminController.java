@@ -16,9 +16,4 @@ public class AdminController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/add")
-    private UserEntity addAccount(@RequestBody UserEntity request) {
-        UserEntity userEntity = userService.createAccount(request);
-        return userEntity;
-    }
 }

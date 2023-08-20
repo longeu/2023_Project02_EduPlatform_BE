@@ -47,7 +47,7 @@ public class CategoryController extends BaseController {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        Optional<CategoryEntity> categoryEntity = categoryService.findByIdAndCurrentUser(id, user);
+        Optional<CategoryEntity> categoryEntity = categoryService.findCategoryId(id);
         if(categoryEntity.isEmpty()){
             errors.put("category", "Not found category");
             throw new NotFoundException(errors);

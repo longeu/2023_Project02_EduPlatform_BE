@@ -12,7 +12,7 @@ import java.util.Date;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "username"})})
+@Table(name = "users")
 public class UserEntity extends BaseEntity {
     private String username;
     private String email;

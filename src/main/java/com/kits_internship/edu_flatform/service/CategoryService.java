@@ -17,5 +17,5 @@ public interface CategoryService extends BaseService<CategoryEntity> {
 
     ListResponseModel filterByCurrentUser(CategoryFilterRequest categoryFilter, Optional<UserPrinciple> user);
 
-    Optional<CategoryEntity> findByIdAndCurrentUser(Long id, Optional<UserPrinciple> user);
+    Optional<CategoryEntity> findCategoryId(Long id);
 }

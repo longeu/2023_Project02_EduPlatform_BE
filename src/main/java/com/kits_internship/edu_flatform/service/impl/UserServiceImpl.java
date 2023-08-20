@@ -3,6 +3,7 @@ package com.kits_internship.edu_flatform.service.impl;
 import com.kits_internship.edu_flatform.config.DateConfig;
 import com.kits_internship.edu_flatform.entity.*;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
+import com.kits_internship.edu_flatform.exception.UnauthorizedException;
 import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.model.request.ActiveAccountRequest;
 import com.kits_internship.edu_flatform.model.request.LoginRequest;
@@ -17,6 +18,7 @@ import com.kits_internship.edu_flatform.service.TeacherService;
 import com.kits_internship.edu_flatform.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -58,9 +60,15 @@ public class UserServiceImpl implements UserService {
     private static final long OTP_VALID_DURATION = 5 * 60 * 1000;   // 5 minutes
 
     @Override
-    public UserEntity createAccount(UserEntity userEntity) {
+    public UserEntity createAccount(UserEntity userEntity, Optional<UserPrinciple> user) {
         Map<String, Object> errors = new HashMap<>();
-        UserEntity existUser = userRepository.findByEmailOrUsername(userEntity.getEmail(), userEntity.getUsername());
+        if (user.isEmpty() && userEntity.getRole().equals(RoleName.ROLE_ADMIN)) {
+            throw new UnauthorizedException();
+        }
+        if (user.isPresent() && !user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN))) {
+            throw new UnauthorizedException();
+        }
+        UserEntity existUser = userRepository.findByRoleAndEmailOrUsername(userEntity.getEmail(), userEntity.getUsername(), userEntity.getRole());
         if (existUser != null) {
             errors.put("user", "Email or Username existed!");
             throw new UnprocessableEntityException(errors);
