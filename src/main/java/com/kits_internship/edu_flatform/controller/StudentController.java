@@ -34,7 +34,7 @@ public class StudentController extends BaseController {
     CourseService courseService;
 
     @GetMapping("/info")
-    private StudentResponse getTeacherInfo(Principal currentUser) {
+    private StudentResponse getStudentInfo(Principal currentUser) {
         Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
@@ -48,7 +48,7 @@ public class StudentController extends BaseController {
     }
 
     @PutMapping("/update")
-    private StudentResponse updateTeacherInfo(@RequestBody StudentRequest request, Principal currentUser) {
+    private StudentResponse updateStudentInfo(@RequestBody StudentRequest request, Principal currentUser) {
         Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
@@ -69,7 +69,6 @@ public class StudentController extends BaseController {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        CourseResponse response = courseService.coursePay(request,currentUser);
-        return response;
+        return courseService.courseTransaction(request,currentUser);
     }
 }

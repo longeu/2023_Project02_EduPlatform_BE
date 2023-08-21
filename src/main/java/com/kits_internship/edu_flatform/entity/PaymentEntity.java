@@ -17,12 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaymentEntity extends BaseEntity {
     private String name;
+    private String image;
     @Enumerated(value = EnumType.STRING)
     private StatusName status;
 
     @OneToMany(mappedBy = "payment")
     private List<TransactionEntity> transactions = new ArrayList<>();
-
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")

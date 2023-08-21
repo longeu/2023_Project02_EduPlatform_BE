@@ -83,7 +83,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
                     PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
         }
 
-
         ListResponseModel responses = new ListResponseModel();
         List<CourseResponse> responseList = courseEntities.stream().map(courseEntity -> modelMapper.map(courseEntity, CourseResponse.class)).collect(Collectors.toList());
         responses.setResults(responseList);
@@ -99,8 +98,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
 
     @Override
     public CourseResponse addByCurrentUser(CourseRequest request, Optional<UserPrinciple> user) {
-        CourseEntity courseEntity = modelMapper.map(request, CourseEntity.class);
-
         if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_TEACHER)) || user.get().getTeacherID() == null) {
             throw new UnauthorizedException();
         }
@@ -114,6 +111,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
             errors.put("category", "Not found category");
             throw new NotFoundException(errors);
         }
+        CourseEntity courseEntity = modelMapper.map(request, CourseEntity.class);
 
         courseEntity.setCategory(categoryEntity.get());
         courseEntity.setTeacher(teacherEntity.get());
@@ -177,7 +175,7 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
     }
 
     @Override
-    public CourseResponse coursePay(CourseTransactionRequest request, Principal currentUser) {
+    public CourseResponse courseTransaction(CourseTransactionRequest request, Principal currentUser) {
 
         return null;
     }

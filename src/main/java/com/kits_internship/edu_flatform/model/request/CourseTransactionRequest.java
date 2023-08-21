@@ -12,8 +12,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseTransactionRequest {
     private Long studentID;
-    private Long courseID;
     private Long paymentID;
+    private String paymentName;
     private BigDecimal total;
     private List<TransactionDetailModel> transactionDetail;
 }

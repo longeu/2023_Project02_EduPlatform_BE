@@ -21,6 +21,7 @@ public class CourseEntity extends BaseEntity{
     private String objectives;
     private String target;
     private String image;
+    private String video;
     @Enumerated(value = EnumType.STRING)
     private StatusName status;
     private BigDecimal price;

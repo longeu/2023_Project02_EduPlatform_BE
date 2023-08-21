@@ -24,6 +24,8 @@ public class CourseRequest {
     private String target;
     @NotBlank
     private String image;
+    @NotBlank
+    private String video;
     @NotNull
     private BigDecimal price;
     @NotNull

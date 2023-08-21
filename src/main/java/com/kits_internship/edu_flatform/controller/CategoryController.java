@@ -40,7 +40,7 @@ public class CategoryController extends BaseController {
     }
 
     @GetMapping("/{id}")
-    private CategoryResponse addCategory(@PathVariable Long id, Principal currentUser) {
+    private CategoryResponse getById(@PathVariable Long id, Principal currentUser) {
         Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {

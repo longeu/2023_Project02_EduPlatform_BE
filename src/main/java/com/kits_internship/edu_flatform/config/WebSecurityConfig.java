@@ -63,7 +63,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.STUDENT_LIST)
                 .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.ADMIN_LIST)
-                .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
+                .hasAuthority(String.valueOf(RoleName.ROLE_ADMIN)));
 
         http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

@@ -26,9 +26,11 @@ public class AuthListFilter {
 
     public static final String[] STUDENT_LIST = {
             "/api/student/**",
+            "/api/payment/list"
     };
 
     public static final String[] ADMIN_LIST = {
             "/api/category/**",
+            "/api/payment/**"
     };
 }

@@ -15,7 +15,6 @@ public class CourseTracsactionResponse {
     private Long id;
     private String transactionName;
     private Long studentID;
-    private Long courseID;
     private Long paymentID;
     private BigDecimal total;
     private List<TransactionDetailModel> transactionDetail;
