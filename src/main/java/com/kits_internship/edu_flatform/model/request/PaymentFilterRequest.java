@@ -8,6 +8,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PaymentFilterRequest extends BasePagingQueryRequest {
-    private String name;
-    private StatusName status;
+    private StatusName status = StatusName.ACTIVE;
 }

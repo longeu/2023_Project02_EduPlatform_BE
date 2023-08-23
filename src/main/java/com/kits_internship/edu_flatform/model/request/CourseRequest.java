@@ -27,6 +27,8 @@ public class CourseRequest {
     @NotBlank
     private String video;
     @NotNull
+    private StatusName status;
+    @NotNull
     private BigDecimal price;
     @NotNull
     private Long categoryID;

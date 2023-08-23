@@ -25,5 +25,4 @@ public interface CourseService extends BaseService<CourseEntity> {
 
     ResponseEntity uploadFile(MultipartFile file, Optional<UserPrinciple> user);
 
-    CourseResponse courseTransaction(CourseTransactionRequest request, Principal currentUser);
 }

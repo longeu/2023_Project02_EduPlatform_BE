@@ -1,11 +1,19 @@
 package com.kits_internship.edu_flatform.model.base;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BasePagingQueryRequest {
+    private String keyword;
     private Integer limit;
     private Integer page;
 
-    public BasePagingQueryRequest() {
-    }
 
     public int getLimit() {
         if (this.limit != null && this.limit >= 0) {

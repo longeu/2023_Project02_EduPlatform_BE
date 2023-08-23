@@ -3,7 +3,6 @@ package com.kits_internship.edu_flatform.service.impl;
 import com.kits_internship.edu_flatform.config.DateConfig;
 import com.kits_internship.edu_flatform.entity.CategoryEntity;
 import com.kits_internship.edu_flatform.entity.RoleName;
-import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnauthorizedException;
 import com.kits_internship.edu_flatform.model.base.ListResponseModel;
@@ -18,12 +17,14 @@ import com.kits_internship.edu_flatform.service.TeacherService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,8 +36,6 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
     @Autowired
     ModelMapper modelMapper;
     @Autowired
-    CategoryRepository categoryRepository;
-    @Autowired
     TeacherService teacherService;
     @Autowired
     DateConfig dateConfig;
@@ -45,7 +44,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
 
     @Override
     public CategoryResponse addByCurrentUser(CategoryRequest request, Optional<UserPrinciple> user) {
-        if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN)) || user.get().getTeacherID() == null) {
+        if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN))) {
             throw new UnauthorizedException();
         }
         CategoryEntity categoryEntity = modelMapper.map(request, CategoryEntity.class);
@@ -67,15 +66,15 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
         CategoryEntity categoryEntity = modelMapper.map(request, CategoryEntity.class);
         categoryEntity.setId(optionalCategory.get().getId());
         categoryEntity.setModifiedDate(dateConfig.getTimestamp());
-        categoryRepository.save(categoryEntity);
+        jpaRepository.save(categoryEntity);
 
         return modelMapper.map(categoryEntity, CategoryResponse.class);
     }
 
     @Override
     public ListResponseModel filterByCurrentUser(CategoryFilterRequest categoryFilter, Optional<UserPrinciple> user) {
-        Page<CategoryEntity> categoryEntities = categoryRepository.filter(
-                categoryFilter.getName(),
+        Page<CategoryEntity> categoryEntities = jpaRepository.filter(
+                categoryFilter.getKeyword(),
                 categoryFilter.getStatus(),
                 PageRequest.of(categoryFilter.getPage() - 1, categoryFilter.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
 
@@ -94,7 +93,7 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
 
     @Override
     public Optional<CategoryEntity> findCategoryId(Long id) {
-        return categoryRepository.findById(id);
+        return jpaRepository.findById(id);
     }
 
 }

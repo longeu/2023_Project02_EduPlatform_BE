@@ -14,11 +14,11 @@ public class TransactionDetailEntity extends BaseEntity {
     private String courseName;
     private String price;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "transactionID")
     private TransactionEntity transaction;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "courseID")
     private CourseEntity course;
 }

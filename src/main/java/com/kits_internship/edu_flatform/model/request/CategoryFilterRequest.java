@@ -8,6 +8,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoryFilterRequest extends BasePagingQueryRequest {
-    private String name;
     private StatusName status;
 }

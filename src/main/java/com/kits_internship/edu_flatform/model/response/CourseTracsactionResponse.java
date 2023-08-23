@@ -1,6 +1,7 @@
 package com.kits_internship.edu_flatform.model.response;
 
-import com.kits_internship.edu_flatform.model.request.TransactionDetailModel;
+import com.kits_internship.edu_flatform.entity.StatusTransaction;
+import com.kits_internship.edu_flatform.model.TransactionDetailModel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,8 +15,9 @@ import java.util.List;
 public class CourseTracsactionResponse {
     private Long id;
     private String transactionName;
-    private Long studentID;
     private Long paymentID;
+    private String paymentName;
     private BigDecimal total;
-    private List<TransactionDetailModel> transactionDetail;
+    private StatusTransaction status;
+    private List<TransactionDetailModel> transactionDetails;
 }

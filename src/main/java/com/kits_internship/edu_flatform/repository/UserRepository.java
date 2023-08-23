@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long>, BaseRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
 
-    @Query("select t from UserEntity t where t.role = ?3 and (t.email = ?1 or t.username = ?2)")
-    UserEntity findByRoleAndEmailOrUsername(String email, String username, RoleName role);
+    @Query("select t from UserEntity t where t.email = ?1 or t.username = ?2")
+    UserEntity findByEmailOrUsername(String email, String username);
 
     Optional<UserEntity> findByUsername(String username);
 }

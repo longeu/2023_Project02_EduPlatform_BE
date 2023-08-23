@@ -15,13 +15,13 @@ import java.util.Optional;
 public interface CategoryRepository extends BaseRepository<CategoryEntity, Long> {
     @Query(value = "select c from CategoryEntity c " +
             " where " +
-            "   (coalesce(:name) is null or :name = '' or" +
-            "   lower(c.name) like concat('%', concat(lower(:name), '%')))" +
+            "   (coalesce(:keyword) is null or :keyword = '' or" +
+            "   lower(c.name) like concat('%', concat(lower(:keyword), '%')))" +
             " and (coalesce(:status,null) is null or c.status in :status ) "
     )
     Page<CategoryEntity> filter(
-            @Param("name")String name,
-            @Param("status")StatusName status,
+            @Param("keyword") String keyword,
+            @Param("status") StatusName status,
             Pageable pageable
     );
 

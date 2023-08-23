@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,11 +18,13 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class TransactionEntity extends BaseEntity {
     private String transactionName;
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @Enumerated(EnumType.STRING)
+    private StatusTransaction status;
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "studentID")
     private StudentEntity student;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "paymentID")
     private PaymentEntity payment;
 
@@ -33,6 +36,6 @@ public class TransactionEntity extends BaseEntity {
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
 
-    @OneToOne(mappedBy = "transaction")
-    private TransactionDetailEntity transactionDetail;
+    @OneToMany(mappedBy = "transaction")
+    private List<TransactionDetailEntity> transactionDetails;
 }

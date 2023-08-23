@@ -37,8 +37,6 @@ import java.util.Optional;
 public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository> implements UserService {
 
     @Autowired
-    UserRepository userRepository;
-    @Autowired
     ModelMapper modelMapper;
     @Autowired
     TeacherService teacherService;
@@ -71,7 +69,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
         if (user.isPresent() && user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN))) {
             throw new UnauthorizedException();
         }
-        UserEntity existUser = userRepository.findByRoleAndEmailOrUsername(userEntity.getEmail(), userEntity.getUsername(), userEntity.getRole());
+        UserEntity existUser = jpaRepository.findByEmailOrUsername(userEntity.getEmail(), userEntity.getUsername());
         if (existUser != null) {
             errors.put("user", "Email or Username existed!");
             throw new UnprocessableEntityException(errors);
@@ -79,7 +77,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
         userEntity.setStatus(StatusName.INACTIVE);
         userEntity.setCreatedDate(dateConfig.getTimestamp());
         userEntity.setModifiedDate(dateConfig.getTimestamp());
-        UserEntity response = userRepository.save(userEntity);
+        UserEntity response = jpaRepository.save(userEntity);
         //OTP create
         OtpEntity otpEntity = new OtpEntity();
         otpEntity.setEmail(userEntity.getEmail());
@@ -93,7 +91,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
 
     @Override
     public UserEntity findByEmail(String email) {
-        Optional<UserEntity> userEntity = userRepository.findByEmail(email);
+        Optional<UserEntity> userEntity = jpaRepository.findByEmail(email);
         if (userEntity.isEmpty()) {
             return null;
         }
@@ -132,7 +130,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
                     response = modelMapper.map(studentEntity, ActiveAccountResponse.class);
                 }
                 userEntity.setModifiedDate(dateConfig.getTimestamp());
-                userRepository.save(userEntity);
+                jpaRepository.save(userEntity);
                 otpRepository.delete(otpEntity);
 
                 response.setRole(userEntity.getRole());
@@ -150,7 +148,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     public LoginResponse login(LoginRequest request) {
         Map<String, Object> errors = new HashMap<>();
 
-        Optional<UserEntity> userEntity = userRepository.findByUsername(request.getUsername());
+        Optional<UserEntity> userEntity = jpaRepository.findByUsername(request.getUsername());
         if (userEntity.isEmpty()) {
             errors.put("user", "Not found Username!");
             throw new NotFoundException(errors);
@@ -179,7 +177,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     @Override
     public UserEntity findByUsername(String username) {
 
-        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
+        Optional<UserEntity> userEntity = jpaRepository.findByUsername(username);
         return userEntity.orElse(null);
     }
 
@@ -208,7 +206,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
             if (userEntity != null && request.getOpt().equals(otpEntity.getOpt())) {
                 userEntity.setPassword(encoder.encode(request.getPassword()));
                 userEntity.setModifiedDate(new Timestamp(currentTimeInMillis));
-                userRepository.save(userEntity);
+                jpaRepository.save(userEntity);
                 otpRepository.delete(otpEntity);
                 return ResponseEntity.status(HttpStatus.OK).body("Success!");
             } else {

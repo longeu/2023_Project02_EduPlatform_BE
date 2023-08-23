@@ -21,7 +21,6 @@ public class CourseEntity extends BaseEntity{
     private String objectives;
     private String target;
     private String image;
-    private String video;
     @Enumerated(value = EnumType.STRING)
     private StatusName status;
     private BigDecimal price;
@@ -34,16 +33,16 @@ public class CourseEntity extends BaseEntity{
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date modifiedDate;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "teacherID")
     private TeacherEntity teacher;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL,optional = false)
+    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL,optional = false)
     @JoinColumn(name = "categoryID")
     private CategoryEntity category;
 
-    @ManyToMany(mappedBy = "enrolledCourses")
-    private Set<StudentEntity> enrolledStudents = new HashSet<>();
+    @ManyToMany(mappedBy = "courses")
+    private List<StudentEntity> students = new ArrayList<>();
 
     @OneToMany(mappedBy = "course")
     private List<LectureEntity> lectures = new ArrayList<>();

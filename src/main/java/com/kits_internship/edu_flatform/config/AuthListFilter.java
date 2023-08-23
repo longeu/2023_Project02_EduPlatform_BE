@@ -15,18 +15,18 @@ public class AuthListFilter {
             "/api/user/forgotPassword",
             "/api/user/resetPassword",
             "/api/category/list",
-            "/api/course/list",
+            "/api/teacher/course/list",
             "/api/user/resentOTP"
     };
 
     public static final String[] TEACHER_LIST = {
             "/api/teacher/**",
-            "/api/course/**"
     };
 
     public static final String[] STUDENT_LIST = {
             "/api/student/**",
-            "/api/payment/list"
+            "/api/payment/list",
+            "/api/payment/{id}"
     };
 
     public static final String[] ADMIN_LIST = {

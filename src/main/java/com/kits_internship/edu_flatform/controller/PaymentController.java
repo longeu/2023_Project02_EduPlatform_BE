@@ -1,7 +1,6 @@
 package com.kits_internship.edu_flatform.controller;
 
 import com.kits_internship.edu_flatform.entity.PaymentEntity;
-import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.model.base.ListResponseModel;
 import com.kits_internship.edu_flatform.model.request.PaymentFilterRequest;
 import com.kits_internship.edu_flatform.model.request.PaymentRequest;
@@ -12,8 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController

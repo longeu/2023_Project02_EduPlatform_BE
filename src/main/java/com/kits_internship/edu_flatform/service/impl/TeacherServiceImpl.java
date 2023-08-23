@@ -24,8 +24,6 @@ import java.util.Optional;
 public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRepository> implements TeacherService {
 
     @Autowired
-    TeacherRepository teacherRepository;
-    @Autowired
     JwtService jwtService;
     @Autowired
     UserRepository userRepository;
@@ -41,14 +39,14 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
     @Override
     public TeacherEntity register(TeacherEntity teacherEntity) {
         Map<String, Object> errors = new HashMap<>();
-        Optional<TeacherEntity> existTeacher = teacherRepository.findByEmail(teacherEntity.getEmail());
+        Optional<TeacherEntity> existTeacher = jpaRepository.findByEmail(teacherEntity.getEmail());
         if (existTeacher.isPresent()) {
             errors.put("teacher", "existed!");
             throw new UnprocessableEntityException(errors);
         }
         teacherEntity.setCreatedDate(dateConfig.getTimestamp());
         teacherEntity.setModifiedDate(dateConfig.getTimestamp());
-        TeacherEntity response = teacherRepository.save(teacherEntity);
+        TeacherEntity response = jpaRepository.save(teacherEntity);
         return response;
     }
 
@@ -61,7 +59,7 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
             if (userEntity.isEmpty()) {
                 throw new NotFoundException("Not found user!");
             }
-            TeacherEntity teacherEntity = teacherRepository.findByUserID(userEntity.get().getId());
+            TeacherEntity teacherEntity = jpaRepository.findByUserID(userEntity.get().getId());
             if (teacherEntity == null) {
                 throw new NotFoundException("Not Found Teacher!");
             }
@@ -86,7 +84,7 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
         teacherEntity.setImage(request.getImage());
         teacherEntity.setModifiedDate(dateConfig.getTimestamp());
 
-        teacherRepository.save(teacherEntity);
+        jpaRepository.save(teacherEntity);
         return teacherEntity;
     }
 }

@@ -11,7 +11,6 @@ import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.model.base.ListResponseModel;
 import com.kits_internship.edu_flatform.model.base.MetadataResponse;
 import com.kits_internship.edu_flatform.model.request.CourseFilterRequest;
-import com.kits_internship.edu_flatform.model.request.CourseTransactionRequest;
 import com.kits_internship.edu_flatform.model.request.CourseRequest;
 import com.kits_internship.edu_flatform.model.response.CourseResponse;
 import com.kits_internship.edu_flatform.repository.CourseRepository;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,36 +62,51 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         List<CourseEntity> emptyList = new ArrayList<>();
         Page<CourseEntity> courseEntities = new PageImpl<>(emptyList);
 
-        String role = user.get().getAuthorities().stream().findAny().get().getAuthority();
-        if (role.equals(String.valueOf(RoleName.ROLE_TEACHER)) && user.get().getTeacherID() != null) {
-            courseEntities = courseRepository.filter(
-                    request.getStatus(),
-                    request.getKeyword(),
-                    request.getCategoryID(),
-                    user.get().getTeacherID(),
-                    null,
-                    PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
-        } else if (role.equals(String.valueOf(RoleName.ROLE_STUDENT))) {
-            courseEntities = courseRepository.filter(
-                    request.getStatus(),
-                    request.getKeyword(),
-                    request.getCategoryID(),
-                    null,
-                    request.isRegisted() ? user.get().getStudentID() : null,
-                    PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+        try {
+            String role = user.get().getAuthorities().stream().findAny().get().getAuthority();
+            if (role.equals(String.valueOf(RoleName.ROLE_TEACHER)) && user.get().getTeacherID() != null) {
+                courseEntities = courseRepository.filter(
+                        request.getStatus(),
+                        request.getKeyword(),
+                        request.getCategoryID(),
+                        user.get().getTeacherID(),
+                        null,
+                        null,
+                        PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+            } else if (role.equals(String.valueOf(RoleName.ROLE_STUDENT))) {
+                courseEntities = courseRepository.filter(
+                        request.getStatus(),
+                        request.getKeyword(),
+                        request.getCategoryID(),
+                        null,
+                        request.getRegisted() != null && request.getRegisted().equals(true) ? user.get().getStudentID() : null,
+                        request.getRegisted() != null ? request.getRegisted() : null,
+                        PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+            }
+
+            ListResponseModel responses = new ListResponseModel();
+            List<CourseResponse> responseList = courseEntities.stream().map(
+                    courseEntity -> {
+                        CourseResponse responseCourse = modelMapper.map(courseEntity, CourseResponse.class);
+                        responseCourse.setTeacherID(courseEntity.getTeacher().getId());
+                        responseCourse.setCategoryID(courseEntity.getCategory().getId());
+                        return responseCourse;
+                    })
+                    .collect(Collectors.toList());
+            responses.setResults(responseList);
+
+            MetadataResponse metadata = new MetadataResponse(
+                    courseEntities.getTotalElements(),
+                    request.getPage(),
+                    request.getLimit()
+            );
+            responses.setMetadata(metadata);
+            return responses;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            errors.put("error", e.getMessage());
+            throw new UnprocessableEntityException(errors);
         }
-
-        ListResponseModel responses = new ListResponseModel();
-        List<CourseResponse> responseList = courseEntities.stream().map(courseEntity -> modelMapper.map(courseEntity, CourseResponse.class)).collect(Collectors.toList());
-        responses.setResults(responseList);
-
-        MetadataResponse metadata = new MetadataResponse(
-                courseEntities.getTotalElements(),
-                request.getPage(),
-                request.getLimit()
-        );
-        responses.setMetadata(metadata);
-        return responses;
     }
 
     @Override
@@ -174,9 +187,4 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         }
     }
 
-    @Override
-    public CourseResponse courseTransaction(CourseTransactionRequest request, Principal currentUser) {
-
-        return null;
-    }
 }

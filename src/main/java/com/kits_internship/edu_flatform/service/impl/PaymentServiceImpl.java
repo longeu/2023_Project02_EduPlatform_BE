@@ -32,8 +32,7 @@ public class PaymentServiceImpl extends BaseServiceImpl<PaymentEntity, PaymentRe
 
     @Autowired
     ModelMapper modelMapper;
-    @Autowired
-    PaymentRepository paymentRepository;
+
     @Autowired
     DateConfig dateConfig;
 
@@ -41,8 +40,8 @@ public class PaymentServiceImpl extends BaseServiceImpl<PaymentEntity, PaymentRe
 
     @Override
     public ListResponseModel filter(PaymentFilterRequest filterRequest) {
-        Page<PaymentEntity> paymentEntities = paymentRepository.filter(
-                filterRequest.getName(),
+        Page<PaymentEntity> paymentEntities = jpaRepository.filter(
+                filterRequest.getKeyword(),
                 filterRequest.getStatus(),
                 PageRequest.of(filterRequest.getPage() - 1, filterRequest.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
 
@@ -61,7 +60,7 @@ public class PaymentServiceImpl extends BaseServiceImpl<PaymentEntity, PaymentRe
 
     @Override
     public Optional<PaymentEntity> findPaymentById(Long id) {
-        Optional<PaymentEntity> paymentEntity = paymentRepository.findById(id);
+        Optional<PaymentEntity> paymentEntity = jpaRepository.findById(id);
         if (paymentEntity.isEmpty()) {
             errors.put("payment", "Not found payment");
             throw new NotFoundException(errors);
@@ -72,7 +71,7 @@ public class PaymentServiceImpl extends BaseServiceImpl<PaymentEntity, PaymentRe
     @Override
     @Transactional
     public PaymentResponse createPayment(PaymentEntity request) {
-        Optional<PaymentEntity> existName = paymentRepository.findByName(request.getName());
+        Optional<PaymentEntity> existName = jpaRepository.findByName(request.getName());
         if (existName.isPresent()) {
             errors.put("payment", "existed!");
             throw new UnprocessableEntityException(errors);

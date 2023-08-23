@@ -19,7 +19,6 @@ public class QuestionBankEntity extends BaseEntity {
     private String type;
     private String content;
     private List<String> options;
-    @Column(name = "correctOption")
     private String correctOption;
 
 

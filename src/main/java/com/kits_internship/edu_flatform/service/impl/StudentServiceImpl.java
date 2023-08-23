@@ -20,10 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class StudentServiceImpl implements StudentService {
-
-    @Autowired
-    StudentRepository studentRepository;
+public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRepository> implements StudentService {
     @Autowired
     JwtService jwtService;
     @Autowired
@@ -33,17 +30,21 @@ public class StudentServiceImpl implements StudentService {
     @Autowired
     DateConfig dateConfig;
 
+    public StudentServiceImpl(StudentRepository jpaRepository) {
+        super(jpaRepository);
+    }
+
     @Override
     public StudentEntity register(StudentEntity studentEntity) {
         Map<String, Object> errors = new HashMap<>();
-        Optional<StudentEntity> existStudent = studentRepository.findByEmail(studentEntity.getEmail());
+        Optional<StudentEntity> existStudent = jpaRepository.findByEmail(studentEntity.getEmail());
         if (existStudent.isPresent()) {
             errors.put("student", "existed!");
             throw new UnprocessableEntityException(errors);
         }
         studentEntity.setCreatedDate(dateConfig.getTimestamp());
         studentEntity.setModifiedDate(dateConfig.getTimestamp());
-        StudentEntity response = studentRepository.save(studentEntity);
+        StudentEntity response = jpaRepository.save(studentEntity);
         return response;
     }
 
@@ -56,7 +57,7 @@ public class StudentServiceImpl implements StudentService {
             if (userEntity.isEmpty()) {
                 throw new NotFoundException("Not found user!");
             }
-            StudentEntity studentEntity = studentRepository.findByUserID(userEntity.get().getId());
+            StudentEntity studentEntity = jpaRepository.findByUserID(userEntity.get().getId());
             if (studentEntity == null) {
                 throw new NotFoundException("Not Found Teacher!");
             }
@@ -78,7 +79,7 @@ public class StudentServiceImpl implements StudentService {
         studentEntity.setDescription(request.getDescription());
         studentEntity.setModifiedDate(dateConfig.getTimestamp());
 
-        studentRepository.save(studentEntity);
+        jpaRepository.save(studentEntity);
         return studentEntity;
     }
 }

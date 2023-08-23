@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/course")
+@RequestMapping("/api/teacher/course")
 public class CourseController extends BaseController {
     @Autowired
     CourseService courseService;

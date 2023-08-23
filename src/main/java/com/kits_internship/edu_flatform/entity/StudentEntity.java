@@ -55,5 +55,5 @@ public class StudentEntity extends BaseEntity {
             joinColumns = @JoinColumn(name = "studentID"),
             inverseJoinColumns = @JoinColumn(name = "courseID")
     )
-    private Set<CourseEntity> enrolledCourses = new HashSet<>();
+    private List<CourseEntity> courses = new ArrayList<>();
 }

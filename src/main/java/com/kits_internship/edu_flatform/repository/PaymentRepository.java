@@ -14,12 +14,12 @@ import java.util.Optional;
 public interface PaymentRepository extends BaseRepository<PaymentEntity, Long> {
     @Query(value = "select c from PaymentEntity c " +
             " where " +
-            "   (coalesce(:name) is null or :name = '' or" +
-            "   lower(c.name) like concat('%', concat(lower(:name), '%')))" +
+            "   (coalesce(:keyword) is null or :keyword = '' or" +
+            "   lower(c.name) like concat('%', concat(lower(:keyword), '%')))" +
             " and (coalesce(:status,null) is null or c.status in :status ) "
     )
     Page<PaymentEntity> filter(
-            @Param("name") String name,
+            @Param("keyword") String keyword,
             @Param("status") StatusName status,
             Pageable pageable
     );
