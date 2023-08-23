@@ -1,13 +1,13 @@
 package com.kits_internship.edu_flatform.controller;
 
-import com.kits_internship.edu_flatform.entity.LectureEntity;
+import com.kits_internship.edu_flatform.entity.QuestionBankEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.model.base.ListResponseModel;
-import com.kits_internship.edu_flatform.model.request.LectureFilterRequest;
-import com.kits_internship.edu_flatform.model.request.LectureRequest;
-import com.kits_internship.edu_flatform.model.response.LectureResponse;
+import com.kits_internship.edu_flatform.model.request.QuestionBankFilterRequest;
+import com.kits_internship.edu_flatform.model.request.QuestionBankRequest;
+import com.kits_internship.edu_flatform.model.response.QuestionBankResponse;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
-import com.kits_internship.edu_flatform.service.LectureService;
+import com.kits_internship.edu_flatform.service.QuestionBankService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,52 +21,56 @@ import java.util.Optional;
 @RequestMapping("/api/teacher/questionBank")
 public class QuestionBankController extends BaseController {
     @Autowired
-    LectureService lectureService;
+    QuestionBankService questionBankService;
     @Autowired
     ModelMapper modelMapper;
 
     @GetMapping("/list")
-    private ListResponseModel listLectures(LectureFilterRequest request, Principal currentUser) {
+    private ListResponseModel listQuestionBank(QuestionBankFilterRequest request, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        return lectureService.filterByCurrentUser(request, user);
+        if(request.getLectureID() == null){
+            errors.put("base", "can't identify lectureID");
+            throw new NotFoundException(errors);
+        }
+        return questionBankService.filterByCurrentUser(request);
     }
 
     @GetMapping("/{id}")
-    private LectureResponse getById(@PathVariable Long id, @RequestParam Long courseID, Principal currentUser) {
+    private QuestionBankResponse getById(@PathVariable Long id, @RequestParam Long lectureID, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        Optional<LectureEntity> lectureEntity = lectureService.findByIdAndCurrentUser(id, courseID, user);
-        if (lectureEntity.isEmpty()) {
-            errors.put("lecture", "Not found lecture");
+        Optional<QuestionBankEntity> questionBankEntity = questionBankService.findByIdAndCurrentUser(id, lectureID, user);
+        if (questionBankEntity.isEmpty()) {
+            errors.put("questionBank", "Not found questionBank");
             throw new NotFoundException(errors);
         }
-        return modelMapper.map(lectureEntity, LectureResponse.class);
+        return modelMapper.map(questionBankEntity, QuestionBankResponse.class);
     }
 
     @PostMapping("/add")
-    private LectureResponse addLecture(@RequestBody LectureRequest request, Principal currentUser) {
+    private QuestionBankResponse addQuestionBank(@RequestBody QuestionBankRequest request, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        return lectureService.addByCurrentUser(request, user);
+        return questionBankService.addByCurrentUser(request, user);
     }
 
     @PutMapping("/update/{id}")
-    private LectureResponse updateLecture(@RequestBody LectureRequest request, @PathVariable Long id, Principal currentUser) {
+    private QuestionBankResponse updateQuestionBank(@RequestBody QuestionBankRequest request, @PathVariable Long id, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        return lectureService.updateByCurrentUser(id, request, user);
+        return questionBankService.updateByCurrentUser(id, request, user);
     }
 }

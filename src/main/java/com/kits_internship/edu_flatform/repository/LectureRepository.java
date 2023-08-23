@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface LectureRepository extends BaseRepository<LectureEntity,Long> {
+public interface LectureRepository extends BaseRepository<LectureEntity, Long> {
     @Query(nativeQuery = true, value = "select l.* from lectures l" +
             "   join courses c on c.id = l.courseID " +
             "   where " +
@@ -31,8 +31,6 @@ public interface LectureRepository extends BaseRepository<LectureEntity,Long> {
     );
 
     @Query(value = "SELECT l FROM LectureEntity l WHERE l.id =:id and l.course.id=:courseID")
-    Optional<LectureEntity> findByIdAndCourse(Long id,Long courseID);
+    Optional<LectureEntity> findByIdAndCourse(Long id, Long courseID);
 
-    @Query(value= "SELECT t FROM LectureEntity t WHERE t.id in :courseIDs")
-    List<LectureEntity> findByListIds(@Param("courseIDs") List<Long> courseIDs);
 }

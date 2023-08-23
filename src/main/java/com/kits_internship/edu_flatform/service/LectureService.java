@@ -15,7 +15,7 @@ public interface LectureService extends BaseService<LectureEntity> {
 
     LectureResponse updateByCurrentUser(Long id, LectureRequest request, Optional<UserPrinciple> user);
 
-    ListResponseModel filterByCurrentUser(LectureFilterRequest request, Optional<UserPrinciple> user);
+    ListResponseModel filterByCurrentUser(LectureFilterRequest request);
 
     Optional<LectureEntity> findByIdAndCurrentUser(Long id, Long courseID, Optional<UserPrinciple> user);
 

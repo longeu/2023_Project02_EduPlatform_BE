@@ -29,7 +29,7 @@ import java.util.stream.LongStream;
 public class FileUtils {
     public void validateFiles(List<MultipartFile> multipartFile) {
         Map<String, Object> errors = new HashMap<>();
-        String pattern = ("[^\\s]+(.*?)\\.(jpg|png|JPG|PNG|pdf|PDF|MP4|mp4|avi|AVI|flv|FLV)$");
+        String pattern = ("[^\\s]+(.*?)\\.(jpg|png|JPG|PNG|pdf|PDF|MP4|mp4|avi|AVI|flv|FLV|xlsx|XLSX|docx|DOCX)$");
         if (multipartFile.stream().anyMatch(x -> x.getName().isBlank())) {
             errors.put("files", "files must have a exist!");
             throw new UnprocessableEntityException(errors);

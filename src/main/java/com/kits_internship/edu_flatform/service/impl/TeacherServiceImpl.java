@@ -11,16 +11,22 @@ import com.kits_internship.edu_flatform.repository.UserRepository;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.security.jwt.JwtService;
 import com.kits_internship.edu_flatform.service.TeacherService;
+import com.kits_internship.edu_flatform.ulti.FileUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRepository> implements TeacherService {
 
     @Autowired
@@ -31,6 +37,8 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
     ModelMapper modelMapper;
     @Autowired
     DateConfig dateConfig;
+    @Autowired
+    FileUtils fileUtils;
 
     public TeacherServiceImpl(TeacherRepository jpaRepository) {
         super(jpaRepository);
@@ -85,5 +93,38 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
 
         jpaRepository.save(teacherEntity);
         return teacherEntity;
+    }
+
+    @Override
+    public ResponseEntity uploadFile(MultipartFile multipartFile, Optional<UserPrinciple> user) {
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+        multipartFiles.add(multipartFile);
+        fileUtils.validateFiles(multipartFiles);
+        try {
+            String fileName = System.currentTimeMillis() + multipartFile.getOriginalFilename();
+
+            File file = fileUtils.convertToFile(multipartFile, fileName);
+            String FILE_URL = "";
+            if (multipartFile.getContentType().startsWith("video")) {
+                FILE_URL = fileUtils.uploadVideo(file, "video/" + fileName);
+            } else if (multipartFile.getContentType().startsWith("image")) {
+                FILE_URL = fileUtils.uploadVideo(file, "image/" + fileName);
+            } else {
+                String[] parts = multipartFile.getContentType().split("\\.");
+                String lastPart = parts[parts.length - 1];
+                if (lastPart.equals("sheet")) {
+                    FILE_URL = fileUtils.uploadVideo(file, "xlsx/" + fileName);
+                } else if (lastPart.equals("document")) {
+                    FILE_URL = fileUtils.uploadVideo(file, "docx/" + fileName);
+                }
+            }
+            file.delete();
+            return ResponseEntity.status(HttpStatus.OK).body(FILE_URL);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            errors.put("errors", e.getMessage());
+            errors.put("file", "files upload fail!");
+            throw new UnprocessableEntityException(errors);
+        }
     }
 }

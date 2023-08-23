@@ -10,12 +10,6 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class CourseFilterRequest extends BasePagingQueryRequest {
-    private Long categoryID;
-    private StatusName status;
-    private Boolean registed;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date fromDate;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date toDate;
+public class QuestionBankFilterRequest extends BasePagingQueryRequest {
+    private Long lectureID;
 }

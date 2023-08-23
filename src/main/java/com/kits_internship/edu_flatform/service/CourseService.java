@@ -23,6 +23,4 @@ public interface CourseService extends BaseService<CourseEntity> {
 
     Optional<CourseEntity> findByIdAndCurrentUser(Long id, Optional<UserPrinciple> user);
 
-    ResponseEntity uploadFile(MultipartFile file, Optional<UserPrinciple> user);
-
 }

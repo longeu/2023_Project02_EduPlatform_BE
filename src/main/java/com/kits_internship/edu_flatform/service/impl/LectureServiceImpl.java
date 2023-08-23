@@ -51,7 +51,7 @@ public class LectureServiceImpl extends BaseServiceImpl<LectureEntity, LectureRe
     FileUtils fileUtils;
 
     @Override
-    public ListResponseModel filterByCurrentUser(LectureFilterRequest request, Optional<UserPrinciple> user) {
+    public ListResponseModel filterByCurrentUser(LectureFilterRequest request) {
         try {
             Page<LectureEntity> lectureEntities = jpaRepository.filter(
                     request.getStatus(),

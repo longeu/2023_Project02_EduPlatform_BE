@@ -35,7 +35,11 @@ public class LectureController extends BaseController {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        return lectureService.filterByCurrentUser(request, user);
+        if(request.getCourseID() == null){
+            errors.put("base", "can't identify courseID");
+            throw new NotFoundException(errors);
+        }
+        return lectureService.filterByCurrentUser(request);
     }
 
     @GetMapping("/{id}")

@@ -15,7 +15,7 @@ public class QuestionBankResponse {
     private String name;
     private String documentPath;
     private String videoPath;
-    private Long courseID;
+    private Long lectureID;
     private StatusName status;
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;

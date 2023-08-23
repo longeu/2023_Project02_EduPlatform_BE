@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,13 +55,13 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
     TeacherService teacherService;
     @Autowired
     CategoryService categoryService;
-    @Autowired
-    FileUtils fileUtils;
 
     @Override
     public ListResponseModel filterByCurrentUser(CourseFilterRequest request, Optional<UserPrinciple> user) {
         List<CourseEntity> emptyList = new ArrayList<>();
         Page<CourseEntity> courseEntities = new PageImpl<>(emptyList);
+        Date fromDate = request.getFromDate() != null ? dateConfig.getStartOfDay(request.getFromDate()) : null;
+        Date toDate = request.getToDate() != null ? dateConfig.getEndOfDay(request.getFromDate()) : null;
 
         try {
             String role = user.get().getAuthorities().stream().findAny().get().getAuthority();
@@ -72,6 +73,8 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
                         user.get().getTeacherID(),
                         null,
                         null,
+                        fromDate,
+                        toDate,
                         PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
             } else if (role.equals(String.valueOf(RoleName.ROLE_STUDENT))) {
                 courseEntities = courseRepository.filter(
@@ -79,9 +82,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
                         request.getKeyword(),
                         request.getCategoryID(),
                         null,
-                        request.getRegisted() != null && request.getRegisted().equals(true) ? user.get().getStudentID() : null,
+                        user.get().getStudentID(),
                         request.getRegisted() != null ? request.getRegisted() : null,
-                        PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+                        request.getFromDate(), request.getToDate(), PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
             }
 
             ListResponseModel responses = new ListResponseModel();
@@ -155,30 +158,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         return courseRepository.findEntityByTeacherID(id, user.get().getTeacherID());
     }
 
-    @Override
-    public ResponseEntity uploadFile(MultipartFile multipartFile, Optional<UserPrinciple> user) {
-        List<MultipartFile> multipartFiles = new ArrayList<>();
-        multipartFiles.add(multipartFile);
-        fileUtils.validateFiles(multipartFiles);
-        try {
-            String fileName = System.currentTimeMillis() + multipartFile.getOriginalFilename();
 
-            File file = fileUtils.convertToFile(multipartFile, fileName);
-            String FILE_URL = "";
-            if (multipartFile.getContentType().startsWith("video")) {
-                FILE_URL = fileUtils.uploadVideo(file, "video/" + fileName);
-            }
-            if (multipartFile.getContentType().startsWith("image")) {
-                FILE_URL = fileUtils.uploadVideo(file, "image/" + fileName);
-            }
-            file.delete();
-            return ResponseEntity.status(HttpStatus.OK).body(FILE_URL);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            errors.put("errors", e.getMessage());
-            errors.put("file", "files upload fail!");
-            throw new UnprocessableEntityException(errors);
-        }
-    }
 
 }

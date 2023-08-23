@@ -64,20 +64,6 @@ public class CourseController extends BaseController {
         return courseService.addByCurrentUser(courseRequest, user);
     }
 
-    @PostMapping("/uploadFile")
-    private ResponseEntity uploadFile(MultipartFile file, Principal currentUser) {
-        Optional<UserPrinciple> user = getJwtUser(currentUser);
-        if (user.isEmpty()) {
-            errors.put("base", "can't identify user");
-            throw new NotFoundException(errors);
-        }
-        if (file == null) {
-            errors.put("file", "can't not be null");
-            throw new UnprocessableEntityException(errors);
-        }
-        return courseService.uploadFile(file, user);
-    }
-
     @PutMapping("/update/{id}")
     private CourseResponse updateCourse(@RequestBody CourseRequest request, @PathVariable Long id, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
