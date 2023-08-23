@@ -50,8 +50,6 @@ public class LectureServiceImpl extends BaseServiceImpl<LectureEntity, LectureRe
     @Autowired
     FileUtils fileUtils;
 
-    private static final Map<String, Object> errors = new HashMap<>();
-
     @Override
     public ListResponseModel filterByCurrentUser(LectureFilterRequest request, Optional<UserPrinciple> user) {
         try {

@@ -30,7 +30,6 @@ public class LectureController extends BaseController {
 
     @GetMapping("/list")
     private ListResponseModel listLectures(LectureFilterRequest request, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -41,7 +40,6 @@ public class LectureController extends BaseController {
 
     @GetMapping("/{id}")
     private LectureResponse getById(@PathVariable Long id, @RequestParam Long courseID, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -57,7 +55,6 @@ public class LectureController extends BaseController {
 
     @PostMapping("/add")
     private LectureResponse addLecture(@RequestBody LectureRequest request, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -68,7 +65,6 @@ public class LectureController extends BaseController {
 
     @PutMapping("/update/{id}")
     private LectureResponse updateLecture(@RequestBody LectureRequest request, @PathVariable Long id, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");

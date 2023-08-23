@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class StudentResponse {
+    private Long id;
     private String email;
     private String phone;
     private String image;

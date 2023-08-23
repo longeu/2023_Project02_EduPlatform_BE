@@ -36,8 +36,6 @@ public class PaymentServiceImpl extends BaseServiceImpl<PaymentEntity, PaymentRe
     @Autowired
     DateConfig dateConfig;
 
-    private static final Map<String, Object> errors = new HashMap<>();
-
     @Override
     public ListResponseModel filter(PaymentFilterRequest filterRequest) {
         Page<PaymentEntity> paymentEntities = jpaRepository.filter(

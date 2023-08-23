@@ -11,5 +11,5 @@ public interface TeacherRepository extends BaseRepository<TeacherEntity, Long> {
     Optional<TeacherEntity> findByEmail(String email);
 
     @Query(nativeQuery = true, value = "SELECT * FROM teacher WHERE userID = ?1")
-    TeacherEntity findByUserID(Long id);
+    Optional<TeacherEntity> findByUserID(Long id);
 }

@@ -62,7 +62,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
 
     @Override
     public UserEntity createAccount(UserEntity userEntity, Optional<UserPrinciple> user) {
-        Map<String, Object> errors = new HashMap<>();
         if (user.isEmpty() && userEntity.getRole().equals(RoleName.ROLE_ADMIN)) {
             throw new UnauthorizedException();
         }
@@ -101,7 +100,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
     @Override
     @Transactional
     public ResponseEntity activeAccount(ActiveAccountRequest activeAccountRequest) {
-        Map<String, Object> errors = new HashMap<>();
+
 
         try {
             ActiveAccountResponse response = new ActiveAccountResponse();
@@ -146,7 +145,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
 
     @Override
     public LoginResponse login(LoginRequest request) {
-        Map<String, Object> errors = new HashMap<>();
+
 
         Optional<UserEntity> userEntity = jpaRepository.findByUsername(request.getUsername());
         if (userEntity.isEmpty()) {
@@ -194,7 +193,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserEntity, UserRepository>
 
     @Override
     public ResponseEntity resetPassword(ActiveAccountRequest request) {
-        Map<String, Object> errors = new HashMap<>();
         try {
             Optional<OtpEntity> optionalOtpEntity = otpRepository.findByEmail(request.getEmail());
             OtpEntity otpEntity = optionalOtpEntity.orElseThrow();

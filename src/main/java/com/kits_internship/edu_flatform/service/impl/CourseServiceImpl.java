@@ -32,7 +32,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,8 +56,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
     CategoryService categoryService;
     @Autowired
     FileUtils fileUtils;
-
-    private static final Map<String, Object> errors = new HashMap<>();
 
     @Override
     public ListResponseModel filterByCurrentUser(CourseFilterRequest request, Optional<UserPrinciple> user) {
@@ -88,8 +88,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
             List<CourseResponse> responseList = courseEntities.stream().map(
                     courseEntity -> {
                         CourseResponse responseCourse = modelMapper.map(courseEntity, CourseResponse.class);
-                        responseCourse.setTeacherID(courseEntity.getTeacher().getId());
-                        responseCourse.setCategoryID(courseEntity.getCategory().getId());
                         return responseCourse;
                     })
                     .collect(Collectors.toList());
@@ -131,9 +129,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         courseEntity = create(courseEntity);
 
         CourseResponse courseResponse = modelMapper.map(courseEntity, CourseResponse.class);
-        courseResponse.setCategoryID(categoryEntity.get().getId());
-        courseResponse.setTeacherID(teacherEntity.get().getId());
-
         return courseResponse;
     }
 
@@ -165,7 +160,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         List<MultipartFile> multipartFiles = new ArrayList<>();
         multipartFiles.add(multipartFile);
         fileUtils.validateFiles(multipartFiles);
-        Map<String, Object> errors = new HashMap<>();
         try {
             String fileName = System.currentTimeMillis() + multipartFile.getOriginalFilename();
 

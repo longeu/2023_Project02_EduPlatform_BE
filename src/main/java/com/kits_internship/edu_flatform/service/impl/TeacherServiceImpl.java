@@ -38,7 +38,6 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
 
     @Override
     public TeacherEntity register(TeacherEntity teacherEntity) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<TeacherEntity> existTeacher = jpaRepository.findByEmail(teacherEntity.getEmail());
         if (existTeacher.isPresent()) {
             errors.put("teacher", "existed!");
@@ -52,18 +51,18 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
 
     @Override
     public TeacherEntity getTeacherInfo(Optional<UserPrinciple> user) {
-        Map<String, Object> errors = new HashMap<>();
+
         try {
             UserPrinciple userPrinciple = user.orElseThrow();
             Optional<UserEntity> userEntity = userRepository.findByUsername(userPrinciple.getUsername());
             if (userEntity.isEmpty()) {
                 throw new NotFoundException("Not found user!");
             }
-            TeacherEntity teacherEntity = jpaRepository.findByUserID(userEntity.get().getId());
-            if (teacherEntity == null) {
+            Optional<TeacherEntity> teacherEntity = jpaRepository.findByUserID(userEntity.get().getId());
+            if (teacherEntity.isEmpty()) {
                 throw new NotFoundException("Not Found Teacher!");
             }
-            return teacherEntity;
+            return teacherEntity.get();
         } catch (Exception e) {
             errors.put("base", e.getMessage());
             throw new NotFoundException(errors);

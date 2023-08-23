@@ -19,13 +19,12 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/student/transaction")
-public class TransactionController extends BaseController{
+public class TransactionController extends BaseController {
     @Autowired
     TransactionService transactionService;
 
     @PostMapping("/coursePay")
     private CourseTracsactionResponse coursePay(@RequestBody CourseTransactionRequest request, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -36,7 +35,6 @@ public class TransactionController extends BaseController{
 
     @GetMapping("/list")
     private ListResponseModel listCoursePay(BasePagingQueryRequest request, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -47,8 +45,7 @@ public class TransactionController extends BaseController{
 
     @GetMapping("/{id}")
     private CourseTracsactionResponse getCoursePayById(@PathVariable Long id, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
-        Optional<UserPrinciple> user = getJwtUser(currentUser);
+        Optional<UserPrinciple > user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);

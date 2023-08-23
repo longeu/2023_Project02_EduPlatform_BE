@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -32,7 +30,6 @@ public class CourseController extends BaseController {
 
     @GetMapping("/list")
     private ListResponseModel listCourses(CourseFilterRequest request, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -44,7 +41,6 @@ public class CourseController extends BaseController {
 
     @GetMapping("/{id}")
     private CourseResponse getById(@PathVariable Long id, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -60,7 +56,6 @@ public class CourseController extends BaseController {
 
     @PostMapping("/add")
     private CourseResponse addCourse(@RequestBody CourseRequest courseRequest, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -71,7 +66,6 @@ public class CourseController extends BaseController {
 
     @PostMapping("/uploadFile")
     private ResponseEntity uploadFile(MultipartFile file, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -86,7 +80,6 @@ public class CourseController extends BaseController {
 
     @PutMapping("/update/{id}")
     private CourseResponse updateCourse(@RequestBody CourseRequest request, @PathVariable Long id, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");

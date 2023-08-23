@@ -1,29 +1,24 @@
 package com.kits_internship.edu_flatform.model.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.kits_internship.edu_flatform.entity.StatusName;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
-public class TeacherResponse {
+public class QuestionBankResponse {
     private Long id;
-    private String email;
-    private String phone;
-    private String firstName;
-    private String lastName;
-    private String image;
-    private String bio;
-    private String link;
-    private List<String> certificates;
-    private String experience;
-    private Long userID;
+    private String description;
+    private String name;
+    private String documentPath;
+    private String videoPath;
+    private Long courseID;
+    private StatusName status;
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date modifiedDate;
-
 }

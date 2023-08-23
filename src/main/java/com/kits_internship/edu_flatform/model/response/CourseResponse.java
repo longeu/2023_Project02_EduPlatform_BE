@@ -20,8 +20,8 @@ public class CourseResponse {
     private String image;
     private StatusName status;
     private BigDecimal price;
-    private Long teacherID;
-    private Long categoryID;
+    private TeacherResponse teacher;
+    private CategoryResponse category;
 
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private Date createdDate;

@@ -44,8 +44,6 @@ public class TransactionServiceImpl extends BaseServiceImpl<TransactionEntity, T
     @Autowired
     PaymentRepository paymentRepository;
 
-    private static final Map<String, Object> errors = new HashMap<>();
-
     @Override
     @Transactional
     public CourseTracsactionResponse courseTransaction(CourseTransactionRequest request, Optional<UserPrinciple> currentUser) {

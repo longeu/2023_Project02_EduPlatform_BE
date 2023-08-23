@@ -40,8 +40,6 @@ public class CategoryServiceImpl extends BaseServiceImpl<CategoryEntity, Categor
     @Autowired
     DateConfig dateConfig;
 
-    private static final Map<String, Object> errors = new HashMap<>();
-
     @Override
     public CategoryResponse addByCurrentUser(CategoryRequest request, Optional<UserPrinciple> user) {
         if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_ADMIN))) {

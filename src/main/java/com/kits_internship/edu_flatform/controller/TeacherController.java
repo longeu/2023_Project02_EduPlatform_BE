@@ -30,7 +30,6 @@ public class TeacherController extends BaseController {
 
     @GetMapping("/info")
     private TeacherResponse getTeacherInfo(Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
@@ -44,7 +43,6 @@ public class TeacherController extends BaseController {
 
     @PutMapping("/update")
     private TeacherResponse updateTeacherInfo(@RequestBody TeacherRequest request, Principal currentUser) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");

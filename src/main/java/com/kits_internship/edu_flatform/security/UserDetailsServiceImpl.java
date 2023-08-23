@@ -5,6 +5,7 @@ import com.kits_internship.edu_flatform.entity.StudentEntity;
 import com.kits_internship.edu_flatform.entity.TeacherEntity;
 import com.kits_internship.edu_flatform.entity.UserEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
+import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
 import com.kits_internship.edu_flatform.repository.StudentRepository;
 import com.kits_internship.edu_flatform.repository.TeacherRepository;
 import com.kits_internship.edu_flatform.repository.UserRepository;
@@ -14,9 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -41,15 +40,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         Long studentID = null;
         Long teacherID = null;
+        Map<String, Object> errors = new HashMap<>();
+        try {
+            if (userEntity.get().getRole().equals(RoleName.ROLE_STUDENT)) {
+                Optional<StudentEntity> studentEntity = studentRepository.findByUserID(userEntity.get().getId());
+                studentID = studentEntity.orElseThrow().getId();
+            }
+            if (userEntity.get().getRole().equals(RoleName.ROLE_TEACHER)) {
+                Optional<TeacherEntity> teacherEntity = teacherRepository.findByUserID(userEntity.get().getId());
+                teacherID = teacherEntity.orElseThrow().getId();
+            }
+            return UserPrinciple.build(userEntity.get(), roles, studentID, teacherID);
+        } catch (Exception e) {
+            errors.put("user", e.getMessage());
+            throw new UnprocessableEntityException(errors);
+        }
 
-        if (userEntity.get().getRole().equals(RoleName.ROLE_STUDENT)) {
-            StudentEntity studentEntity = studentRepository.findByUserID(userEntity.get().getId());
-            studentID = studentEntity.getId();
-        }
-        if (userEntity.get().getRole().equals(RoleName.ROLE_TEACHER)) {
-            TeacherEntity teacherEntity = teacherRepository.findByUserID(userEntity.get().getId());
-            teacherID = teacherEntity.getId();
-        }
-        return UserPrinciple.build(userEntity.get(), roles, studentID, teacherID);
     }
 }

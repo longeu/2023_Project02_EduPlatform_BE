@@ -13,5 +13,5 @@ public interface StudentRepository extends BaseRepository<StudentEntity,Long> {
     Optional<StudentEntity> findByEmail(String email);
 
     @Query(nativeQuery = true, value = "SELECT * FROM student WHERE userID = ?1")
-    StudentEntity findByUserID(Long id);
+    Optional<StudentEntity> findByUserID(Long id);
 }

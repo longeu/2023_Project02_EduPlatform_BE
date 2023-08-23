@@ -36,7 +36,6 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
 
     @Override
     public StudentEntity register(StudentEntity studentEntity) {
-        Map<String, Object> errors = new HashMap<>();
         Optional<StudentEntity> existStudent = jpaRepository.findByEmail(studentEntity.getEmail());
         if (existStudent.isPresent()) {
             errors.put("student", "existed!");
@@ -50,18 +49,17 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
 
     @Override
     public StudentEntity getStudentInfo(Optional<UserPrinciple> user) {
-        Map<String, Object> errors = new HashMap<>();
         try {
             UserPrinciple userPrinciple = user.orElseThrow();
             Optional<UserEntity> userEntity = userRepository.findByUsername(userPrinciple.getUsername());
             if (userEntity.isEmpty()) {
                 throw new NotFoundException("Not found user!");
             }
-            StudentEntity studentEntity = jpaRepository.findByUserID(userEntity.get().getId());
-            if (studentEntity == null) {
-                throw new NotFoundException("Not Found Teacher!");
+            Optional<StudentEntity> studentEntity = jpaRepository.findByUserID(userEntity.get().getId());
+            if (studentEntity.isEmpty()) {
+                throw new NotFoundException("Not Found student!");
             }
-            return studentEntity;
+            return studentEntity.get();
         } catch (Exception e) {
             errors.put("base", e.getMessage());
             throw new NotFoundException(errors);
@@ -70,6 +68,11 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
 
     @Override
     public StudentEntity updateInfo(StudentRequest request, Optional<UserPrinciple> user) {
+        Optional<UserEntity> userEntity = userRepository.findByEmail(request.getEmail());
+        if(userEntity.isPresent()){
+            errors.put("user","email have existed");
+            throw new UnprocessableEntityException(errors);
+        }
         StudentEntity studentEntity = getStudentInfo(user);
         studentEntity.setPhone(request.getPhone());
         studentEntity.setEmail(request.getEmail());

@@ -1,77 +1,72 @@
 package com.kits_internship.edu_flatform.controller;
 
-import com.kits_internship.edu_flatform.entity.CategoryEntity;
+import com.kits_internship.edu_flatform.entity.LectureEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.model.base.ListResponseModel;
-import com.kits_internship.edu_flatform.model.request.CategoryFilterRequest;
-import com.kits_internship.edu_flatform.model.request.CategoryRequest;
-import com.kits_internship.edu_flatform.model.response.CategoryResponse;
+import com.kits_internship.edu_flatform.model.request.LectureFilterRequest;
+import com.kits_internship.edu_flatform.model.request.LectureRequest;
+import com.kits_internship.edu_flatform.model.response.LectureResponse;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
-import com.kits_internship.edu_flatform.service.CategoryService;
+import com.kits_internship.edu_flatform.service.LectureService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/category")
-public class CategoryController extends BaseController {
+@RequestMapping("/api/teacher/questionBank")
+public class QuestionBankController extends BaseController {
     @Autowired
-    CategoryService categoryService;
+    LectureService lectureService;
     @Autowired
     ModelMapper modelMapper;
 
     @GetMapping("/list")
-    private ListResponseModel listCategory(CategoryFilterRequest categoryFilter, Principal currentUser) {
-
+    private ListResponseModel listLectures(LectureFilterRequest request, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        ListResponseModel categoryResponse = categoryService.filterByCurrentUser(categoryFilter, user);
-        return categoryResponse;
+        return lectureService.filterByCurrentUser(request, user);
     }
 
     @GetMapping("/{id}")
-    private CategoryResponse getById(@PathVariable Long id, Principal currentUser) {
+    private LectureResponse getById(@PathVariable Long id, @RequestParam Long courseID, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        Optional<CategoryEntity> categoryEntity = categoryService.findCategoryId(id);
-        if(categoryEntity.isEmpty()){
-            errors.put("category", "Not found category");
+        Optional<LectureEntity> lectureEntity = lectureService.findByIdAndCurrentUser(id, courseID, user);
+        if (lectureEntity.isEmpty()) {
+            errors.put("lecture", "Not found lecture");
             throw new NotFoundException(errors);
         }
-        CategoryResponse categoryResponse = modelMapper.map(categoryEntity, CategoryResponse.class);
-        return categoryResponse;
+        return modelMapper.map(lectureEntity, LectureResponse.class);
     }
 
     @PostMapping("/add")
-    private CategoryResponse addCategory(@RequestBody CategoryRequest request, Principal currentUser) {
+    private LectureResponse addLecture(@RequestBody LectureRequest request, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        return categoryService.addByCurrentUser(request, user);
+        return lectureService.addByCurrentUser(request, user);
     }
 
     @PutMapping("/update/{id}")
-    private CategoryResponse updateCategory(@RequestBody CategoryRequest request, @PathVariable Long id, Principal currentUser) {
+    private LectureResponse updateLecture(@RequestBody LectureRequest request, @PathVariable Long id, Principal currentUser) {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        return categoryService.updateByCurrentUser(id, request, user);
+        return lectureService.updateByCurrentUser(id, request, user);
     }
 }
