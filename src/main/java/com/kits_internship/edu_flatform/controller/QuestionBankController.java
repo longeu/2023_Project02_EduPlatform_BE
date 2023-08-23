@@ -32,10 +32,7 @@ public class QuestionBankController extends BaseController {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        if(request.getLectureID() == null){
-            errors.put("base", "can't identify lectureID");
-            throw new NotFoundException(errors);
-        }
+
         return questionBankService.filterByCurrentUser(request);
     }
 
@@ -59,6 +56,10 @@ public class QuestionBankController extends BaseController {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
+            throw new NotFoundException(errors);
+        }
+        if(request.getLectureID() == null){
+            errors.put("base", "can't identify lectureID");
             throw new NotFoundException(errors);
         }
         return questionBankService.addByCurrentUser(request, user);
