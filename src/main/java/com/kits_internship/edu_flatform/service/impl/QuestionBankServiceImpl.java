@@ -95,7 +95,9 @@ public class QuestionBankServiceImpl extends BaseServiceImpl<QuestionBankEntity,
             questionBankEntity.setModifiedDate(dateConfig.getTimestamp());
             questionBankEntity.setLecture(lectureEntity);
             questionBankEntity = jpaRepository.save(questionBankEntity);
-            return modelMapper.map(questionBankEntity, QuestionBankResponse.class);
+            QuestionBankResponse questionBankResponse = modelMapper.map(questionBankEntity, QuestionBankResponse.class);
+            questionBankResponse.setLectureID(questionBankEntity.getLecture().getId());
+            return questionBankResponse;
         } catch (Exception e) {
             errors.put("errors", e.getMessage());
             errors.put("questionBank", "Add not success!");

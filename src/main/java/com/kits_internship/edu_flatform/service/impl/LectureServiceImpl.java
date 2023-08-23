@@ -26,9 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -96,7 +94,9 @@ public class LectureServiceImpl extends BaseServiceImpl<LectureEntity, LectureRe
             lectureEntity.setModifiedDate(dateConfig.getTimestamp());
             lectureEntity.setCourse(courseEntity);
             lectureEntity = jpaRepository.save(lectureEntity);
-            return modelMapper.map(lectureEntity, LectureResponse.class);
+            LectureResponse lectureResponse = modelMapper.map(lectureEntity, LectureResponse.class);
+            lectureResponse.setCourseID(lectureEntity.getCourse().getId());
+            return lectureResponse;
         } catch (Exception e) {
             errors.put("errors", e.getMessage());
             errors.put("lecture", "Add not success!");
