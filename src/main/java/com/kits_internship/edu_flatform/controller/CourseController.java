@@ -1,5 +1,6 @@
 package com.kits_internship.edu_flatform.controller;
 
+import com.kits_internship.edu_flatform.entity.CategoryEntity;
 import com.kits_internship.edu_flatform.entity.CourseEntity;
 import com.kits_internship.edu_flatform.exception.NotFoundException;
 import com.kits_internship.edu_flatform.exception.UnprocessableEntityException;
@@ -59,6 +60,10 @@ public class CourseController extends BaseController {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
+            throw new NotFoundException(errors);
+        }
+        if (courseRequest.getCategoryID() == null) {
+            errors.put("category", "Not found category");
             throw new NotFoundException(errors);
         }
         return courseService.addByCurrentUser(courseRequest, user);

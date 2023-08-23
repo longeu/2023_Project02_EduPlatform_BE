@@ -35,10 +35,7 @@ public class LectureController extends BaseController {
             errors.put("base", "can't identify user");
             throw new NotFoundException(errors);
         }
-        if(request.getCourseID() == null){
-            errors.put("base", "can't identify courseID");
-            throw new NotFoundException(errors);
-        }
+
         return lectureService.filterByCurrentUser(request);
     }
 
@@ -62,6 +59,10 @@ public class LectureController extends BaseController {
         Optional<UserPrinciple> user = getJwtUser(currentUser);
         if (user.isEmpty()) {
             errors.put("base", "can't identify user");
+            throw new NotFoundException(errors);
+        }
+        if(request.getCourseID() == null){
+            errors.put("base", "can't identify courseID");
             throw new NotFoundException(errors);
         }
         return lectureService.addByCurrentUser(request, user);

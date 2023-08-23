@@ -115,14 +115,14 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         if (!user.get().getAuthorities().stream().findAny().get().getAuthority().equals(String.valueOf(RoleName.ROLE_TEACHER)) || user.get().getTeacherID() == null) {
             throw new UnauthorizedException();
         }
-        Optional<TeacherEntity> teacherEntity = Optional.ofNullable(teacherService.findById(user.get().getTeacherID()));
-        if (teacherEntity.isEmpty()) {
-            errors.put("teacher", "Not found teacher");
-            throw new NotFoundException(errors);
-        }
         Optional<CategoryEntity> categoryEntity = categoryService.findCategoryId(request.getCategoryID());
         if (categoryEntity.isEmpty()) {
             errors.put("category", "Not found category");
+            throw new NotFoundException(errors);
+        }
+        Optional<TeacherEntity> teacherEntity = Optional.ofNullable(teacherService.findById(user.get().getTeacherID()));
+        if (teacherEntity.isEmpty()) {
+            errors.put("teacher", "Not found teacher");
             throw new NotFoundException(errors);
         }
         CourseEntity courseEntity = modelMapper.map(request, CourseEntity.class);
