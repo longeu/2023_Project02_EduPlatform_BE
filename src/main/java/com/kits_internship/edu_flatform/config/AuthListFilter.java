@@ -20,6 +20,7 @@ public class AuthListFilter {
             "/api/teacher/questionBank/list",
             "/api/payment/list",
             "/api/category/list",
+            "/error",
     };
 
     public static final String[] TEACHER_LIST = {
