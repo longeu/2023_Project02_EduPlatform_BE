@@ -18,7 +18,6 @@ import com.kits_internship.edu_flatform.security.UserPrinciple;
 import com.kits_internship.edu_flatform.service.CategoryService;
 import com.kits_internship.edu_flatform.service.CourseService;
 import com.kits_internship.edu_flatform.service.TeacherService;
-import com.kits_internship.edu_flatform.ulti.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +25,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -84,7 +79,9 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
                         null,
                         user.get().getStudentID(),
                         request.getRegisted() != null ? request.getRegisted() : null,
-                        request.getFromDate(), request.getToDate(), PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
+                        fromDate,
+                        toDate,
+                        PageRequest.of(request.getPage() - 1, request.getLimit(), Sort.by(Sort.Order.desc("createdDate"))));
             }
 
             ListResponseModel responses = new ListResponseModel();
@@ -157,7 +154,6 @@ public class CourseServiceImpl extends BaseServiceImpl<CourseEntity, CourseRepos
         }
         return courseRepository.findEntityByTeacherID(id, user.get().getTeacherID());
     }
-
 
 
 }
