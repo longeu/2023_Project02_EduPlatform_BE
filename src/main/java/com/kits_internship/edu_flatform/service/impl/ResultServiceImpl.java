@@ -144,7 +144,7 @@ public class ResultServiceImpl extends BaseServiceImpl<ResultEntity, ResultRepos
 
         } catch (Exception e) {
             errors.put("errors", e.getMessage());
-            errors.put("transaction", "Not found transaction");
+            errors.put("result", "Not found result");
             throw new NotFoundException(errors);
         }
     }
