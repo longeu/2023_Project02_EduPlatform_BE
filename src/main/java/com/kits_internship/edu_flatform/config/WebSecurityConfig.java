@@ -3,6 +3,7 @@ package com.kits_internship.edu_flatform.config;
 import com.kits_internship.edu_flatform.entity.RoleName;
 import com.kits_internship.edu_flatform.security.UserDetailsServiceImpl;
 import com.kits_internship.edu_flatform.security.jwt.JwtAuthFilter;
+import com.kits_internship.edu_flatform.security.jwt.JwtAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,9 +30,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebSecurityConfig {
     @Autowired
     private JwtAuthFilter authFilter;
-
     @Autowired
     AuthListFilter authListFilter;
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     //authentication
@@ -55,6 +57,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf(AbstractHttpConfigurer::disable);
+
         http.authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(AuthListFilter.AUTH_WHITE_LIST).permitAll());
 
@@ -64,6 +67,8 @@ public class WebSecurityConfig {
                 .hasAuthority(String.valueOf(RoleName.ROLE_STUDENT)));
         http.authorizeHttpRequests((authorize) -> authorize.requestMatchers(AuthListFilter.ADMIN_LIST)
                 .hasAuthority(String.valueOf(RoleName.ROLE_ADMIN)));
+
+//        http.exceptionHandling((exception)-> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         http.authorizeHttpRequests((authorize) -> authorize.anyRequest().authenticated());
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

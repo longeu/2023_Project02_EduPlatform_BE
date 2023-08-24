@@ -64,7 +64,7 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
             UserPrinciple userPrinciple = user.orElseThrow();
             Optional<UserEntity> userEntity = userRepository.findByUsername(userPrinciple.getUsername());
             if (userEntity.isEmpty()) {
-                throw new NotFoundException("Not found user!");
+                throw new NotFoundException("Not found user");
             }
             Optional<TeacherEntity> teacherEntity = jpaRepository.findByUserID(userEntity.get().getId());
             if (teacherEntity.isEmpty()) {
@@ -81,7 +81,6 @@ public class TeacherServiceImpl extends BaseServiceImpl<TeacherEntity, TeacherRe
     public TeacherEntity updateInfo(TeacherRequest request, Optional<UserPrinciple> user) {
         TeacherEntity teacherEntity = getTeacherInfo(user);
         teacherEntity.setPhone(request.getPhone());
-        teacherEntity.setEmail(request.getEmail());
         teacherEntity.setBio(request.getBio());
         teacherEntity.setCertificates(request.getCertificates());
         teacherEntity.setExperience(request.getExperience());

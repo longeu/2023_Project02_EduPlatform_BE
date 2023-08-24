@@ -53,7 +53,7 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
             UserPrinciple userPrinciple = user.orElseThrow();
             Optional<UserEntity> userEntity = userRepository.findByUsername(userPrinciple.getUsername());
             if (userEntity.isEmpty()) {
-                throw new NotFoundException("Not found user!");
+                throw new NotFoundException("Not found user");
             }
             Optional<StudentEntity> studentEntity = jpaRepository.findByUserID(userEntity.get().getId());
             if (studentEntity.isEmpty()) {
@@ -68,14 +68,8 @@ public class StudentServiceImpl extends BaseServiceImpl<StudentEntity, StudentRe
 
     @Override
     public StudentEntity updateInfo(StudentRequest request, Optional<UserPrinciple> user) {
-        Optional<UserEntity> userEntity = userRepository.findByEmail(request.getEmail());
-        if(userEntity.isPresent()){
-            errors.put("user","email have existed");
-            throw new UnprocessableEntityException(errors);
-        }
         StudentEntity studentEntity = getStudentInfo(user);
         studentEntity.setPhone(request.getPhone());
-        studentEntity.setEmail(request.getEmail());
         studentEntity.setFirstName(request.getFirstName());
         studentEntity.setLastName(request.getLastName());
         studentEntity.setImage(request.getImage());

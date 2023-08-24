@@ -1,5 +1,6 @@
 package com.kits_internship.edu_flatform.controller;
 
+import com.kits_internship.edu_flatform.exception.UnauthorizedException;
 import com.kits_internship.edu_flatform.security.UserPrinciple;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -24,4 +25,10 @@ public class BaseController {
         return Optional.empty();
     }
 
+    protected void adminCheck(Optional<UserPrinciple> currentUser){
+        String role = currentUser.get().getAuthorities().stream().findAny().get().getAuthority();
+        if(!role.equals("ROLE_ADMIN")){
+            throw new UnauthorizedException();
+        }
+    }
 }

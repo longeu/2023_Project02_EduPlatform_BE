@@ -31,6 +31,5 @@ public class UserEntity extends BaseEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-
     private Date modifiedDate;
 }

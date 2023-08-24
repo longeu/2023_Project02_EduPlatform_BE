@@ -162,7 +162,7 @@ public class TransactionServiceImpl extends BaseServiceImpl<TransactionEntity, T
 
         } catch (Exception e) {
             errors.put("errors", e.getMessage());
-            errors.put("transaction", "Not found transaction!");
+            errors.put("transaction", "Not found transaction");
             throw new NotFoundException(errors);
         }
     }

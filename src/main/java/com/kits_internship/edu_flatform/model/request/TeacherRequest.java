@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @Setter
 public class TeacherRequest {
-    private String email;
     private String phone;
     private String firstName;
     private String lastName;

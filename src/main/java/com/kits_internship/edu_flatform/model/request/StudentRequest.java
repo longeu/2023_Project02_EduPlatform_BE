@@ -9,7 +9,6 @@ import java.util.Date;
 @Getter
 @Setter
 public class StudentRequest {
-    private String email;
     private String phone;
     private String image;
     private String firstName;

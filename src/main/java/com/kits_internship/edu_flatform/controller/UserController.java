@@ -36,31 +36,26 @@ public class UserController extends BaseController {
 
     @PostMapping("/resentOTP")
     private ResponseEntity resentOTP(@RequestParam String email) {
-        ResponseEntity response = userService.resentOTP(email);
-        return response;
+        return userService.resentOTP(email);
     }
 
     @PostMapping("/activeAccount")
     private ResponseEntity activeAccount(@RequestBody ActiveAccountRequest request) {
-        ResponseEntity response = userService.activeAccount(request);
-        return response;
+        return userService.activeAccount(request);
     }
 
     @PostMapping("/login")
     private LoginResponse login(@RequestBody LoginRequest request) {
-        LoginResponse response = userService.login(request);
-        return response;
+        return userService.login(request);
     }
 
     @PostMapping("/forgotPassword")
     private ResponseEntity forgotPassword(@RequestParam String email){
-        ResponseEntity responseEntity = userService.forgotPassword(email);
-        return responseEntity;
+        return userService.forgotPassword(email);
     }
 
     @PostMapping("/resetPassword")
     private ResponseEntity resetPassword(@RequestBody ActiveAccountRequest request){
-        ResponseEntity responseEntity = userService.resetPassword(request);
-        return responseEntity;
+        return userService.resetPassword(request);
     }
 }
